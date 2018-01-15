@@ -7,9 +7,9 @@ import java.util.TimerTask;
  */
 public class Main {
     public static void main(String[] args) {
-        String product = "EAM";
+        String product = "XEServer";
         String version = "9.0.0";
-        Scheduler scheduler = new Scheduler(product, version, 3000);
+        Scheduler scheduler = new Scheduler(product, version, 10000);
 
 
     }
