@@ -27,8 +27,9 @@ public class PullTask extends TimerTask {
                                     productName     +
                                     "\\"            +
                                     latestBuildNumber);
-        System.out.println("DEstionation: " + destination);
 
-        //new FilePuller(productName, latestBuildNumber);
+        String currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
+        System.out.println("currently installed build: "+currentBuildNumber);
+        new FilePuller(destination);
     }
 }
