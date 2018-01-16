@@ -32,20 +32,12 @@ public class FSUtil {
             try {
                 bufferedReader = new BufferedReader(new FileReader(versionTxt));
                 currentProductBuild = bufferedReader.readLine();
-                getVersionInt(currentProductBuild);
+                res = getVersionInt(currentProductBuild);
+                bufferedReader.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-        }
-
-        switch (prdctNm) {
-            case "EAM" : {
-                res = System.getenv("EAMRoot");
-            }
-            case "XEServer" : {
-                res = System.getenv("XESRoot");
             }
         }
         return res;
@@ -53,12 +45,10 @@ public class FSUtil {
 
     public static String getVersionInt(String line) {
         String result="";
-        String v = "8.8.1";
         Pattern pattern = Pattern.compile("\\d{3,}$");
         Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
-            System.out.println("found");
-            System.out.println(matcher.group());
+            result = matcher.group(0);
         }
         return result;
     }

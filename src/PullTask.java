@@ -19,17 +19,23 @@ public class PullTask extends TimerTask {
     @Override
     public void run() {
         netBrowser netBrowser = new netBrowser(productName, productVersion);
-        String latestBuildNumber = netBrowser.getLatestBuildNumber();
+        int latestBuildNumber = Integer.parseInt(netBrowser.getLatestBuildNumber());
+        int currentBuildNumber = Integer.parseInt(FSUtil.getCurrentBuildNumber(productName, productVersion));
+        if (currentBuildNumber >= latestBuildNumber) {
+            System.out.println("Current " +productName+" is is up-to-date");
+            return;
+        }
 
-        File destination = new File(netBrowser.BASE_PATH +
+        File destinationFolder = new File(netBrowser.BASE_PATH +
                                     productVersion  +
                                     "\\"            +
                                     productName     +
                                     "\\"            +
                                     latestBuildNumber);
-
-        String currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
-        System.out.println("currently installed build: "+currentBuildNumber);
-        new FilePuller(destination);
+        for ( File f:
+             destinationFolder.listFiles()) {
+            System.out.println(f);
+        }
+//        new FilePuller(downloadDestination);
     }
 }

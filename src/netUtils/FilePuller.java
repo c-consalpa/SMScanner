@@ -1,9 +1,8 @@
 package netUtils;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import org.apache.commons.io.IOUtils;
 
+import java.io.*;
 
 
 /**
@@ -12,6 +11,16 @@ import java.io.FileInputStream;
 public class FilePuller {
     File destination = null;
     public FilePuller(File dstntn) {
+        System.out.println(dstntn);
         this.destination = dstntn;
+        BufferedInputStream bfIn;
+        BufferedOutputStream bfOut;
+
+//        try {
+////            bfIn = new BufferedInputStream(new FileInputStream(destination));
+////            bfOut = new BufferedOutputStream(new FileOutputStream())
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 }
