@@ -2,7 +2,9 @@ import FSUtils.FSUtil;
 import netUtils.FilePuller;
 import netUtils.netBrowser;
 
+
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.TimerTask;
 
 /**
@@ -20,11 +22,11 @@ public class PullTask extends TimerTask {
     public void run() {
         netBrowser netBrowser = new netBrowser(productName, productVersion);
         int latestBuildNumber = Integer.parseInt(netBrowser.getLatestBuildNumber());
-        int currentBuildNumber = Integer.parseInt(FSUtil.getCurrentBuildNumber(productName, productVersion));
-        if (currentBuildNumber >= latestBuildNumber) {
-            System.out.println("Current " +productName+" is is up-to-date");
-            return;
-        }
+//        int currentBuildNumber = Integer.parseInt(FSUtil.getCurrentBuildNumber(productName, productVersion));
+//        if (currentBuildNumber >= latestBuildNumber) {
+//            System.out.println("Current " +productName+" is up-to-date");
+//            return;
+//        }
 
         File destinationFolder = new File(netBrowser.BASE_PATH +
                                     productVersion  +
@@ -32,10 +34,24 @@ public class PullTask extends TimerTask {
                                     productName     +
                                     "\\"            +
                                     latestBuildNumber);
-        for ( File f:
-             destinationFolder.listFiles()) {
-            System.out.println(f);
+
+     new FilePuller(FileToDownload(destinationFolder));
+    }
+
+    File FileToDownload(File dstntnFldr) {
+        File link = new File("");
+       File[] files = dstntnFldr.listFiles(new FilenameFilter() {
+            @Override
+        public boolean accept(File dir, String name) {
+           if(name.endsWith("exe")) {
+               return true;
+           } else return false;
         }
-//        new FilePuller(downloadDestination);
+    });
+        if (files.length == 1) {
+            link=files[0];
+        }
+        System.out.println("assembled link: "+link);
+        return link;
     }
 }
