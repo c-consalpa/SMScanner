@@ -53,13 +53,13 @@ public class FSUtil {
 
     public static String getVersionInt(String line) {
         String result="";
-        Pattern pattern = Pattern.compile("^.?$"
-//                                          "8.8.1"
-//                                        "\\d{3,5}$"
-        );
+        String v = "8.8.1";
+        Pattern pattern = Pattern.compile("\\d{3,}$");
         Matcher matcher = pattern.matcher(line);
-        System.out.println("FIND");
-        System.out.println(matcher.find());
+        if (matcher.find()) {
+            System.out.println("found");
+            System.out.println(matcher.group());
+        }
         return result;
     }
 }
