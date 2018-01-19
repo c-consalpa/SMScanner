@@ -10,30 +10,44 @@ public class netBrowser {
     private String productName;
     private String version;
     public static String BASE_PATH = "\\\\enbuild06\\Builds\\";
-    File productDestination;
+    File productFolderDestination;
 
     public netBrowser(String productName, String version) {
         this.productName = productName;
         this.version = version;
-
-        productDestination = new File(BASE_PATH +
+        productFolderDestination = new File(BASE_PATH +
                 version +
                 "\\" +
                 productName);
-        System.out.println("Connected to: "+productDestination.toString());
+    }
+
+    public File getLatestBuildPath() {
+        File path = null;
+        File buildFolder = new File(productFolderDestination, getLatestBuildNumber());
+        File[] files = buildFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if(name.endsWith(".pdf")) {
+                    return true;
+                } else return false;
+            }
+        });
+        if (files.length>0) {
+            path = files[0];
+        }
+        return path;
     }
 
     public String getLatestBuildNumber() {
-        File propsFile = new File(productDestination, "latest.properties");
+        File propsFile = new File(productFolderDestination, "latest.properties");
         Properties props = new Properties();
         Reader propsInReader=null;
-
         try {
             propsInReader = new BufferedReader(new FileReader(propsFile));
             props.load(propsInReader);
             propsInReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("ERROR: File not found.");
+            System.out.println("ERROR: Property File not found.");
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println("ERROR: Error while reading .property file.");
@@ -41,12 +55,12 @@ public class netBrowser {
         }
 
         String buildNumber = props.getProperty("_b_build");
-        System.out.println("Latest "+productName+ " build: " +buildNumber);
         return buildNumber;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        System.out.println("GC!");
+    public String getLatestBuildName() {
+        return getLatestBuildPath().getName();
     }
+
+
 }

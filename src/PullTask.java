@@ -21,37 +21,19 @@ public class PullTask extends TimerTask {
     @Override
     public void run() {
         netBrowser netBrowser = new netBrowser(productName, productVersion);
-        int latestBuildNumber = Integer.parseInt(netBrowser.getLatestBuildNumber());
-//        int currentBuildNumber = Integer.parseInt(FSUtil.getCurrentBuildNumber(productName, productVersion));
-//        if (currentBuildNumber >= latestBuildNumber) {
-//            System.out.println("Current " +productName+" is up-to-date");
-//            return;
-//        }
+        String buildName = netBrowser.getLatestBuildName();
+        String buildNumber = netBrowser.getLatestBuildNumber();
+        String currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);;
+        File srcPath = netBrowser.getLatestBuildPath();
+//        File targetPath = FSUtil.getDownloadFolder(productName, productVersion, buildName);
 
-        File destinationFolder = new File(netBrowser.BASE_PATH +
-                                    productVersion  +
-                                    "\\"            +
-                                    productName     +
-                                    "\\"            +
-                                    latestBuildNumber);
+        if (Integer.parseInt(currentBuildNumber) >= Integer.parseInt(buildNumber)) {
+            System.out.println("Current " +productName+" is up-to-date");
+            return;
+        }
+        FSUtil.removeOldBuilds(buildName);
+        new FilePuller(srcPath, buildName);
 
-     new FilePuller(FileToDownload(destinationFolder));
     }
 
-    File FileToDownload(File dstntnFldr) {
-        File link = new File("");
-       File[] files = dstntnFldr.listFiles(new FilenameFilter() {
-            @Override
-        public boolean accept(File dir, String name) {
-           if(name.endsWith("exe")) {
-               return true;
-           } else return false;
-        }
-    });
-        if (files.length == 1) {
-            link=files[0];
-        }
-        System.out.println("assembled link: "+link);
-        return link;
-    }
 }

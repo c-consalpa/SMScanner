@@ -1,5 +1,7 @@
 package FSUtils;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,13 +12,16 @@ import static java.lang.System.getenv;
  * Created by Konstantin on 14.01.2018.
  */
 public class FSUtil {
-    public static void cleanupBuildsFolder(String productName) {
+    static String BUILDS_FOLDER_BASE = "D:\\\\Builds\\";
 
-    }
 
-    public static void initHomeFolders(String product, String version) {
-        File buildsFolder = new File("D:\\Builds");
-        System.out.println(buildsFolder.exists());
+    public static void initHomeFolders(String prdctNm, String prdctVrsn) {
+        File buildsFolder = new File("D:\\\\Builds\\" + prdctNm + "\\" + prdctVrsn);
+        if (!buildsFolder.exists()) {
+            buildsFolder.mkdirs();
+            System.out.println("Folders initialized");
+        }
+
     }
 
     public static String getCurrentBuildNumber(String prdctNm, String prdctVrsn) {
@@ -24,8 +29,8 @@ public class FSUtil {
         String ECRootPath = System.getenv("ECRootPath");
         String currentProductBuild = "";
         File currentProductDirectory = new File(ECRootPath +
-                                                "\\" +
-                                                prdctNm);
+                "\\" +
+                prdctNm);
         File versionTxt = new File(currentProductDirectory, "version.txt");
         if (versionTxt.exists()) {
             BufferedReader bufferedReader = null;
@@ -44,12 +49,27 @@ public class FSUtil {
     }
 
     public static String getVersionInt(String line) {
-        String result="";
+        String result = "";
         Pattern pattern = Pattern.compile("\\d{3,}$");
         Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
             result = matcher.group(0);
         }
         return result;
+    }
+
+
+    public static File getDownloadFolder(String productName, String productVersion, String buildName) {
+        File srcFile = new File("D:\\\\Builds\\" + productName + "\\" + productVersion + "\\" + buildName);
+        return srcFile;
+    }
+
+    public static void removeOldBuilds(String name) {
+        File f = new File("D:\\Builds\\EAM\\9.0.0\\"+name);
+        System.out.println(f);
+        if (f.exists()) {
+            System.out.println("Deleting");
+            System.out.println( f.delete());
+        }
     }
 }
