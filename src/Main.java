@@ -12,7 +12,7 @@ public class Main {
         String version = "9.0.0";
         FSUtil.initHomeFolders(product, version);
 
-        Scheduler scheduler = new Scheduler(product, version, 20000);
+        Scheduler scheduler = new Scheduler(product, version, 1000*60*60*24);
 
 
     }

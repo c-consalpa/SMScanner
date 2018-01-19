@@ -8,7 +8,6 @@ public class Scheduler {
     TimerTask task;
     public Scheduler(String product, String version, long interval) {
         task = new PullTask(product, version);
-
         new Timer().schedule(task, 1000, interval);
     }
 }

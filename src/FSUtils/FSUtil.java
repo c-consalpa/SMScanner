@@ -64,12 +64,15 @@ public class FSUtil {
         return srcFile;
     }
 
-    public static void removeOldBuilds(String name) {
-        File f = new File("D:\\Builds\\EAM\\9.0.0\\"+name);
-        System.out.println(f);
-        if (f.exists()) {
-            System.out.println("Deleting");
-            System.out.println( f.delete());
+
+    public static void cleanupFolder(File target) {
+        try {
+                FileUtils.cleanDirectory(target.getParentFile());
+                Thread.sleep(5000);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-    }
 }

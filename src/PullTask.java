@@ -21,18 +21,25 @@ public class PullTask extends TimerTask {
     @Override
     public void run() {
         netBrowser netBrowser = new netBrowser(productName, productVersion);
-        String buildName = netBrowser.getLatestBuildName();
-        String buildNumber = netBrowser.getLatestBuildNumber();
-        String currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);;
+        String latestBuildNumber = netBrowser.getLatestBuildNumber();
+        String latestBuildName = netBrowser.getLatestBuildName();
+        String currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
         File srcPath = netBrowser.getLatestBuildPath();
-//        File targetPath = FSUtil.getDownloadFolder(productName, productVersion, buildName);
+        File targetPath = FSUtil.getDownloadFolder(productName, productVersion, latestBuildName);
 
-        if (Integer.parseInt(currentBuildNumber) >= Integer.parseInt(buildNumber)) {
+        System.out.println("build name: " +latestBuildName);
+        System.out.println(latestBuildNumber);
+        System.out.println(currentBuildNumber);
+        System.out.println(srcPath);
+        System.out.println(targetPath);
+
+        if (Integer.parseInt(currentBuildNumber) >= Integer.parseInt(latestBuildNumber)) {
             System.out.println("Current " +productName+" is up-to-date");
             return;
         }
-        FSUtil.removeOldBuilds(buildName);
-        new FilePuller(srcPath, buildName);
+        FSUtil.cleanupFolder(targetPath);
+
+        new FilePuller(srcPath, latestBuildName);
 
     }
 
