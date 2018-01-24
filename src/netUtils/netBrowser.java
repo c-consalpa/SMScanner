@@ -1,5 +1,7 @@
 package netUtils;
 
+import FSUtils.FSUtil;
+
 import java.io.*;
 import java.util.Properties;
 
@@ -28,7 +30,7 @@ public class netBrowser {
         File[] files = buildFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                if(name.endsWith(".pdf")) {
+                if(name.endsWith(FSUtil.FILE_EXTENSION)) {
                     return true;
                 } else return false;
             }

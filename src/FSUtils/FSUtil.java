@@ -48,8 +48,8 @@ public class FSUtil {
                     BufferedReader bReader = new BufferedReader(new FileReader(latestTxt));
             ) {
                 String tmp = bReader.readLine();
-                if(!tmp.isEmpty()) {
-                    version = Integer.parseInt(tmp);
+                if(tmp!=null && !tmp.isEmpty()) {
+                   version=Integer.parseInt(tmp);
                 } else {
                     version = 1;
                 }
@@ -117,9 +117,7 @@ public class FSUtil {
         for (File f :
                 files2Clean) {
             if (!f.isDirectory()) {
-                System.out.println("Deleteing:"+f);
-                System.out.println(f.delete());
-
+                f.delete();
             }
         }
 
@@ -131,7 +129,14 @@ public class FSUtil {
     }
 
     public static void updateLatestTxt(File targetFolderPath, int latestBuildNumber) {
-
+        File latestTxt = new File(targetFolderPath, "latest.txt");
+       try (
+               FileWriter fileWriter = new FileWriter(latestTxt);
+               ) {
+           fileWriter.write(Integer.toString(latestBuildNumber));
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
     }
 
 }
