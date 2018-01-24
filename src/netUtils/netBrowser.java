@@ -12,6 +12,7 @@ public class netBrowser {
     public static String BASE_PATH = "\\\\enbuild06\\Builds\\";
     File productFolderDestination;
 
+
     public netBrowser(String productName, String version) {
         this.productName = productName;
         this.version = version;
@@ -23,7 +24,7 @@ public class netBrowser {
 
     public File getLatestBuildPath() {
         File path = null;
-        File buildFolder = new File(productFolderDestination, getLatestBuildNumber());
+        File buildFolder = new File(productFolderDestination, Integer.toString(getLatestBuildNumber()));
         File[] files = buildFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -38,7 +39,7 @@ public class netBrowser {
         return path;
     }
 
-    public String getLatestBuildNumber() {
+    public int getLatestBuildNumber() {
         File propsFile = new File(productFolderDestination, "latest.properties");
         Properties props = new Properties();
         Reader propsInReader=null;
@@ -47,15 +48,16 @@ public class netBrowser {
             props.load(propsInReader);
             propsInReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("ERROR: Property File not found.");
+            System.out.println("Cannot connect to: "+productFolderDestination);
             e.printStackTrace();
+            return 1;
         } catch (IOException e) {
             System.out.println("ERROR: Error while reading .property file.");
             e.printStackTrace();
         }
 
         String buildNumber = props.getProperty("_b_build");
-        return buildNumber;
+        return Integer.parseInt(buildNumber);
     }
 
     public String getLatestBuildName() {

@@ -6,8 +6,8 @@ import java.util.TimerTask;
  */
 public class Scheduler {
     TimerTask task;
-    public Scheduler(String product, String version, long interval) {
-        task = new PullTask(product, version);
+    public Scheduler(String[] products, String version, long interval) {
+        task = new PullTask(products, version);
         new Timer().schedule(task, 1000, interval);
     }
 }

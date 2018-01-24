@@ -12,19 +12,57 @@ import static java.lang.System.getenv;
  * Created by Konstantin on 14.01.2018.
  */
 public class FSUtil {
-    static String BUILDS_FOLDER_BASE = "D:\\\\Builds\\";
+    public static String HOMEFS_BUILDS_FOLDER;
+    public static String FILE_EXTENSION;
 
 
-    public static void initHomeFolders(String prdctNm, String prdctVrsn) {
-        File buildsFolder = new File("D:\\\\Builds\\" + prdctNm + "\\" + prdctVrsn);
-        if (!buildsFolder.exists()) {
-            buildsFolder.mkdirs();
-            System.out.println("Folders initialized");
+
+
+    public static void initHomeFolders(String[] products, String prdctVrsn) {
+        for (String productName:
+             products) {
+            File buildsFolder = new File(HOMEFS_BUILDS_FOLDER +
+                    prdctVrsn +
+                    "\\" +
+                    productName);
+            if (!buildsFolder.exists()) {
+                buildsFolder.mkdirs();
+                System.out.println("Folders initialized");
+            }
         }
-
     }
 
-    public static String getCurrentBuildNumber(String prdctNm, String prdctVrsn) {
+    public static int getCurrentBuildNumber(String prdctNm, String prdctVrsn) {
+        int version = 0;
+        File latestTxt = new File(HOMEFS_BUILDS_FOLDER +
+                prdctVrsn +
+                "\\" +
+                prdctNm +
+                "\\" +
+                "latest.txt");
+
+        if (!latestTxt.exists()) {
+            return version=1;
+        } else {
+            try (
+                    BufferedReader bReader = new BufferedReader(new FileReader(latestTxt));
+            ) {
+                String tmp = bReader.readLine();
+                if(!tmp.isEmpty()) {
+                    version = Integer.parseInt(tmp);
+                } else {
+                    version = 1;
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return version;
+    }
+
+    public static String getCurrentBuildNumberFromInstalledProduct(String prdctNm, String prdctVrsn) {
         String res = "";
         String ECRootPath = System.getenv("ECRootPath");
         String currentProductBuild = "";
@@ -58,21 +96,42 @@ public class FSUtil {
         return result;
     }
 
+    public static File getTargetFolder(String productName, String productVersion) {
+        File targetFolder = new File(HOMEFS_BUILDS_FOLDER +
+                productVersion +
+                "\\" +
+                productName +
+                "\\");
 
-    public static File getDownloadFolder(String productName, String productVersion, String buildName) {
-        File srcFile = new File("D:\\\\Builds\\" + productName + "\\" + productVersion + "\\" + buildName);
-        return srcFile;
+        return targetFolder.isDirectory()?targetFolder:null;
     }
 
+    public static void cleanupFolder(File targetFolder) {
+            File[] files2Clean = targetFolder.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(FILE_EXTENSION)?true:false;
+                }
+            });
 
-    public static void cleanupFolder(File target) {
-        try {
-                FileUtils.cleanDirectory(target.getParentFile());
-                Thread.sleep(5000);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        for (File f :
+                files2Clean) {
+            if (!f.isDirectory()) {
+                System.out.println("Deleteing:"+f);
+                System.out.println(f.delete());
+
             }
         }
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void updateLatestTxt(File targetFolderPath, int latestBuildNumber) {
+
+    }
+
 }

@@ -8,11 +8,13 @@ import java.util.TimerTask;
  */
 public class Main {
     public static void main(String[] args) {
-        String product = "EAM";
+        String[] products = {"EAM"};
         String version = "9.0.0";
-        FSUtil.initHomeFolders(product, version);
+        FSUtil.HOMEFS_BUILDS_FOLDER = "D:\\\\Builds\\";
+        FSUtil.FILE_EXTENSION = "msi";
 
-        Scheduler scheduler = new Scheduler(product, version, 1000*60*60*24);
+        FSUtil.initHomeFolders(products, version);
+        new Scheduler(products, version, 100000);
 
 
     }
