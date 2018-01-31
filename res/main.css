@@ -1,0 +1,10 @@
+.label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: red;
+
+}
+
+.check-box {
+    -fx-label-padding: 5px;
+}
