@@ -1,5 +1,4 @@
-package netUtils;
-
+import GUI.MainApp;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -30,4 +29,6 @@ public class FilePuller {
             e.printStackTrace();
         }
     }
+
+//    GUI.MainAppController
 }

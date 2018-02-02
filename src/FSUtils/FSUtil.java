@@ -12,8 +12,8 @@ import static java.lang.System.getenv;
  * Created by Konstantin on 14.01.2018.
  */
 public class FSUtil {
-    public static String HOMEFS_BUILDS_FOLDER;
-    public static String FILE_EXTENSION;
+    public static String HOMEFS_BUILDS_FOLDER = "D:\\\\Builds\\";
+    public static String FILE_EXTENSION = "pdf";
 
 
 

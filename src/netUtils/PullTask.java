@@ -1,10 +1,10 @@
+package netUtils;
+
 import FSUtils.FSUtil;
-import netUtils.FilePuller;
-import netUtils.netBrowser;
+
 
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Date;
 import java.util.TimerTask;
 
@@ -49,7 +49,7 @@ public class PullTask extends TimerTask {
         }
 
         FSUtil.cleanupFolder(targetFolderPath);
-        new FilePuller(srcFilePath, targetFolderPath, latestBuildName);
+//        new FilePuller(srcFilePath, targetFolderPath, latestBuildName);
         FSUtil.updateLatestTxt(targetFolderPath, latestBuildNumber);
     }
 }

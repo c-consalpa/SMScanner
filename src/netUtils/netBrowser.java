@@ -27,6 +27,7 @@ public class netBrowser {
     public File getLatestBuildPath() {
         File path = null;
         File buildFolder = new File(productFolderDestination, Integer.toString(getLatestBuildNumber()));
+        System.out.println(buildFolder);
         File[] files = buildFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
