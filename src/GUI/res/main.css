@@ -1,10 +1,16 @@
 .label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: red;
-
 }
 
-.check-box {
-    -fx-label-padding: 5px;
+.choice-box, .choice-box .context-menu {
+    -fx-pref-width: 100px;
+}
+
+.choice-box .context-menu {
+    -fx-background-color: D8D8D8;
+}
+
+.choice-box > * {
+    -fx-text-alignment: center;
 }
