@@ -23,6 +23,9 @@ import java.util.List;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
+    public MainAppController() {
+        System.out.println("controller created");
+    }
     private File dst;
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
@@ -45,6 +48,9 @@ public class MainAppController {
     private TextField destinationDirectoryTextField;
 
     @FXML
+    private TextArea consoleTextArea;
+
+    @FXML
     private void initialize() {
         setupVersionChoiceList();
         setupPollChoiceList();
@@ -65,7 +71,7 @@ public class MainAppController {
         System.out.println(pollInterval);
         System.out.println(destinationDirectory);
 
-        new Scheduler(selectedProducts, version, 10000);
+        new Scheduler(selectedProducts, version, 10000, this);
     }
 
 
@@ -121,4 +127,8 @@ public class MainAppController {
         return dst!=null?dst.toString():"D://Builds";
     }
 
+
+    public TextArea getConsoleTextArea() {
+        return consoleTextArea;
+    }
 }

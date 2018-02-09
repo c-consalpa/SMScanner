@@ -29,9 +29,7 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("SMScanner.fxml"));
         this.root = loader.load();
-
         controller = loader.getController();
-
         controller.setMainApp(this);
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
@@ -40,6 +38,5 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 
 }

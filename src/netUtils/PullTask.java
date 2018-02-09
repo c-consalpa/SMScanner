@@ -1,7 +1,9 @@
 package netUtils;
 
 import FSUtils.FSUtil;
-
+import GUI.MainApp;
+import GUI.MainAppController;
+import javafx.scene.control.TextArea;
 
 
 import java.io.File;
@@ -12,16 +14,20 @@ import java.util.TimerTask;
  * Created by Konstantin on 14.01.2018.
  */
 public class PullTask extends TimerTask {
+    public MainAppController controller;
+    public TextArea console;
     private String[] productNames;
     private String productVersion;
-    public PullTask(String[] products, String version) {
+    public PullTask(String[] products, String version, MainAppController mainAppController) {
         productNames = products;
         productVersion = version;
+        this.controller = mainAppController;
+        console = controller.getConsoleTextArea();
     }
 
     @Override
     public void run() {
-        System.out.println(new Date().toString());
+        controller.getConsoleTextArea().appendText(new Date().toString());
         for (String productName: productNames) {
             downloadProduct(productName);
         }
@@ -43,8 +49,8 @@ public class PullTask extends TimerTask {
         System.out.println("Target folder: "          + targetFolderPath);
 
         if (currentBuildNumber >= latestBuildNumber) {
-            System.out.println("Current " + productName + " " + productVersion +
-                    "("+ currentBuildNumber + ")" + " is up-to-date");
+            console.appendText("Current " + productName + " " + productVersion +
+                    "("+ currentBuildNumber + ")" + " is up-to-date\r\n");
             return;
         }
 
