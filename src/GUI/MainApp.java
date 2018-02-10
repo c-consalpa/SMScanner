@@ -12,7 +12,6 @@ import netUtils.netBrowser;
 
 import java.io.IOException;
 
-
 public class MainApp extends Application {
     private Stage primaryStage;
     private MainAppController controller;
@@ -38,5 +37,4 @@ public class MainApp extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }

@@ -15,9 +15,6 @@ public class FSUtil {
     public static String HOMEFS_BUILDS_FOLDER = "D:\\\\Builds\\";
     public static String FILE_EXTENSION = "pdf";
 
-
-
-
     public static void initHomeFolders(String[] products, String prdctVrsn) {
         for (String productName:
              products) {

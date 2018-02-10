@@ -11,9 +11,10 @@ import java.util.TimerTask;
  */
 public class Scheduler {
     TimerTask task;
+
     public Scheduler(String[] products, String version, long interval, MainAppController mainAppController) {
-        System.out.println("controller: "+mainAppController);
         task = new PullTask(products, version, mainAppController);
-        new Timer().schedule(task, 1000, interval);
+        new Timer().schedule(task, 10000, interval);
+        FSUtils.FSUtil.initHomeFolders(products, version);
     }
 }
