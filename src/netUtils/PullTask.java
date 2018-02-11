@@ -15,14 +15,12 @@ import java.util.TimerTask;
  */
 public class PullTask extends TimerTask {
     public MainAppController controller;
-    public TextArea console;
     private String[] productNames;
     private String productVersion;
     public PullTask(String[] products, String version, MainAppController mainAppController) {
         productNames = products;
         productVersion = version;
         this.controller = mainAppController;
-        console = controller.getConsoleTextArea();
     }
 
     @Override
@@ -31,31 +29,33 @@ public class PullTask extends TimerTask {
         for (String productName: productNames) {
             downloadProduct(productName);
         }
-        System.out.println("*********");
+        controller.consoleLog("*********");
     }
 
     private void downloadProduct(String productName) {
         netBrowser netBrowser = new netBrowser(productName, productVersion);
+
         int latestBuildNumber = netBrowser.getLatestBuildNumber();
         String latestBuildName = netBrowser.getLatestBuildName();
-        int currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
         File srcFilePath = netBrowser.getLatestBuildPath();
+
+        int currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
         File targetFolderPath = FSUtil.getTargetFolder(productName, productVersion);
 
-        System.out.println("Latest build name: "    + latestBuildName);
-        System.out.println("Latest build number: "  + latestBuildNumber);
-        System.out.println("Current build number: " + currentBuildNumber);
-        System.out.println("Source Path: "          + srcFilePath);
-        System.out.println("Target folder: "          + targetFolderPath);
+        controller.consoleLog("Latest build name: "    + latestBuildName);
+        controller.consoleLog("Latest build number: "  + latestBuildNumber);
+        controller.consoleLog("Current build number: " + currentBuildNumber);
+        controller.consoleLog("Source Path: "          + srcFilePath);
+        controller.consoleLog("Target folder: "          + targetFolderPath);
 
         if (currentBuildNumber >= latestBuildNumber) {
-            console.appendText("Current " + productName + " " + productVersion +
-                    "("+ currentBuildNumber + ")" + " is up-to-date\r\n");
+            controller.consoleLog("Current " + productName + " " + productVersion +
+                    "("+ currentBuildNumber + ")" + " is up-to-date");
             return;
         }
 
         FSUtil.cleanupFolder(targetFolderPath);
-//        new FilePuller(srcFilePath, targetFolderPath, latestBuildName);
+        new FilePuller(srcFilePath, targetFolderPath, latestBuildName, controller);
         FSUtil.updateLatestTxt(targetFolderPath, latestBuildNumber);
     }
 }

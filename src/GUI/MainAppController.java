@@ -23,9 +23,7 @@ import java.util.List;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
-    public MainAppController() {
-        System.out.println("controller created");
-    }
+
     private File dst;
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
@@ -66,10 +64,10 @@ public class MainAppController {
         int pollInterval = getPollInterval();
         String destinationDirectory = getDestinationDirectory();
 
-        System.out.println(getProducts());
-        System.out.println(version);
-        System.out.println(pollInterval);
-        System.out.println(destinationDirectory);
+//        System.out.println(getProducts());
+//        System.out.println(version);
+//        System.out.println(pollInterval);
+//        System.out.println(destinationDirectory);
 
         new Scheduler(selectedProducts, version, 10000, this);
     }
@@ -127,8 +125,12 @@ public class MainAppController {
         return dst!=null?dst.toString():"D://Builds";
     }
 
-
     public TextArea getConsoleTextArea() {
         return consoleTextArea;
+    }
+
+    public void consoleLog(String s) {
+        consoleTextArea.appendText(s);
+        consoleTextArea.appendText("\r\n");
     }
 }
