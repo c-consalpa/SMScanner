@@ -57,7 +57,6 @@ public class netBrowser {
             System.out.println("ERROR: Error while reading .property file.");
             e.printStackTrace();
         }
-
         String buildNumber = props.getProperty("_b_build");
         return Integer.parseInt(buildNumber);
     }

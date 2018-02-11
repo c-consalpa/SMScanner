@@ -23,7 +23,10 @@ import java.util.List;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
     private File dst;
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
@@ -63,17 +66,20 @@ public class MainAppController {
         String version = getVersion();
         int pollInterval = getPollInterval();
         String destinationDirectory = getDestinationDirectory();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
 //        System.out.println(getProducts());
 //        System.out.println(version);
 //        System.out.println(pollInterval);
 //        System.out.println(destinationDirectory);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
         new Scheduler(selectedProducts, version, 10000, this);
     }
-
-
-
 
     @FXML
     private void onBrowseBtn(ActionEvent ev) {
@@ -86,7 +92,6 @@ public class MainAppController {
         }
         destinationDirectoryTextField.positionCaret(100);
     }
-
 
     private void setupVersionChoiceList() {
         String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0"};

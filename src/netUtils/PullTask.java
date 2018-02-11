@@ -29,7 +29,11 @@ public class PullTask extends TimerTask {
         for (String productName: productNames) {
             downloadProduct(productName);
         }
+<<<<<<< HEAD
         controller.consoleLog("*********");
+=======
+        controller.consoleLog("***********");
+>>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
     }
 
     private void downloadProduct(String productName) {
@@ -50,7 +54,11 @@ public class PullTask extends TimerTask {
 
         if (currentBuildNumber >= latestBuildNumber) {
             controller.consoleLog("Current " + productName + " " + productVersion +
+<<<<<<< HEAD
                     "("+ currentBuildNumber + ")" + " is up-to-date");
+=======
+                    "("+ currentBuildNumber + ")" + " is up-to-date\r\n");
+>>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
             return;
         }
 
