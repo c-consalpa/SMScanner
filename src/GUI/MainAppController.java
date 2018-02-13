@@ -1,9 +1,13 @@
 package GUI;
 
+import GUI.MainApp;
+import Work.downloadTask;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableIntegerArray;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -23,10 +27,6 @@ import java.util.List;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
-<<<<<<< HEAD
-
-=======
->>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
     private File dst;
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
@@ -59,26 +59,15 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-        if (getProducts().size()==0) {
-            return;
-        }
-        String[] selectedProducts = getProducts().toArray(new String[0]);
-        String version = getVersion();
-        int pollInterval = getPollInterval();
-        String destinationDirectory = getDestinationDirectory();
-<<<<<<< HEAD
-
-=======
->>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
-//        System.out.println(getProducts());
-//        System.out.println(version);
-//        System.out.println(pollInterval);
-//        System.out.println(destinationDirectory);
-<<<<<<< HEAD
-
-=======
->>>>>>> 2f76e3b4fe55b3c7c1fadc4f4914b9d74dbe8401
-        new Scheduler(selectedProducts, version, 10000, this);
+//        Service service = new Service<String>() {
+//            @Override
+//            protected Task<String> createTask() {
+//                return new downloadTask("EAM", "9.0.0");
+//            }
+//        };
+//        service.start();
+        downloadTask task = new downloadTask("EAM", "9.0.0");
+        task.
     }
 
     @FXML
