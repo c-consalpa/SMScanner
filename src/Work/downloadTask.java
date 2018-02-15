@@ -10,21 +10,34 @@ import java.nio.file.Path;
 public class downloadTask extends Task<String> {
     private String productName;
     private String productVersion;
-    private Path downloadToPath;
-    private int latest;
+    private final String[] products;
+    private final String version;
+    private final int pollingInterval;
+    private final File destination;
+
     private File downloadFrom;
     private File downloadTo;
 
-    public downloadTask(String productName, String productVersion) {
-        this.productName = productName;
-        this.productVersion = productVersion;
+    public downloadTask(String[] products, String version, int pollingInterval, File destination) {
+        this.products = products;
+        this.version = version;
+        this.pollingInterval = pollingInterval;
+        this.destination = destination;
     }
 
     @Override
     protected String call() throws Exception {
-        getBuildParams();
-        downloadData(downloadFrom, downloadTo);
-        return "returnString";
+        System.out.println(Thread.currentThread().getName());
+        for (String product:
+             products) {
+            System.out.println("IT#");
+            productName = product;
+            productVersion = version;
+
+            setBuildParams();
+            downloadData(downloadFrom, downloadTo);
+        }
+        return "";
     }
 
     private void downloadData(File downloadFrom, File downloadTo) {
@@ -48,24 +61,22 @@ public class downloadTask extends Task<String> {
         }
     }
 
-    private void getBuildParams() {
+    private void setBuildParams() {
         netBrowser netBrowser = new netBrowser(productName, productVersion);
 
         int latestBuildNumber = netBrowser.getLatestBuildNumber();
         String latestBuildName = netBrowser.getLatestBuildName();
         int currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
-        downloadFrom = netBrowser.getLatestBuildPath();
         File targetFolderPath = FSUtil.getTargetFolder(productName, productVersion);
-        downloadTo = new File(targetFolderPath, latestBuildName);
 
+        downloadTo = new File(targetFolderPath, latestBuildName);
+        downloadFrom = netBrowser.getLatestBuildPath();
 
         if (currentBuildNumber >= latestBuildNumber) {
             System.out.println("Current " + productName + " " + productVersion +
                     "("+ currentBuildNumber + ")" + " is up-to-date");
             return;
         }
-
-
     }
 
 }

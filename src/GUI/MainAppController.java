@@ -1,6 +1,8 @@
 package GUI;
 
+import FSUtils.FSUtil;
 import GUI.MainApp;
+import Work.DownloadService;
 import Work.downloadTask;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
@@ -27,7 +29,7 @@ import java.util.List;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
-    private File dst;
+
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
@@ -59,25 +61,29 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-//        Service service = new Service<String>() {
-//            @Override
-//            protected Task<String> createTask() {
-//                return new downloadTask("EAM", "9.0.0");
-//            }
-//        };
-//        service.start();
-        downloadTask task = new downloadTask("EAM", "9.0.0");
-        task.
+        String[] products = new String[getProducts().size()];
+        System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
+        String version = getVersion();
+        int pollingInterval = getPollInterval();
+        File destination = getDestination();
+
+        DownloadService downloadService = new DownloadService(products, version, pollingInterval, destination);
+        downloadService.start();
     }
 
     @FXML
     private void onBrowseBtn(ActionEvent ev) {
+        setDestinationField();
+    }
+
+    private void setDestinationField() {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Download builds to..");
         File destinationDirectory = chooser.showDialog(splitPane.getScene().getWindow());
-        if (null!=destinationDirectoryTextField) {
-            destinationDirectoryTextField.setText(destinationDirectory.toString() + "   ");
-            dst = destinationDirectory;
+        if (destinationDirectory!=null) {
+            destinationDirectoryTextField.setText(destinationDirectory.toString());
+        } else {
+            destinationDirectoryTextField.setText(FSUtil.HOMEFS_BUILDS_FOLDER);
         }
         destinationDirectoryTextField.positionCaret(100);
     }
@@ -115,8 +121,16 @@ public class MainAppController {
         return choice_poll.getValue();
     }
 
-    private String getDestinationDirectory() {
-        return dst!=null?dst.toString():"D://Builds";
+    private File getDestination() {
+        String tmp = destinationDirectoryTextField.getText();
+        File destination;
+        if (tmp.isEmpty()) {
+            destination = new File(FSUtil.HOMEFS_BUILDS_FOLDER);
+        } else {
+            destination = new File(tmp);
+        }
+        System.out.println(destination);
+        return destination;
     }
 
     public TextArea getConsoleTextArea() {
