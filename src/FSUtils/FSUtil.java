@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.System.getenv;
+
 
 /**
  * Created by Konstantin on 14.01.2018.
@@ -24,7 +24,7 @@ public class FSUtil {
                     productName);
             if (!buildsFolder.exists()) {
                 buildsFolder.mkdirs();
-                System.out.println("Folders initialized");
+                System.out.println("Folders initialized: "+buildsFolder);
             }
         }
     }
@@ -118,11 +118,6 @@ public class FSUtil {
             }
         }
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void updateLatestTxt(File targetFolderPath, int latestBuildNumber) {

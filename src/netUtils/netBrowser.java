@@ -12,13 +12,13 @@ public class netBrowser {
     private String productName;
     private String version;
     public static String BASE_PATH = "\\\\enbuild06\\Builds\\";
-    File productFolderDestination;
+    File remote_productsFolder;
 
 
     public netBrowser(String productName, String version) {
         this.productName = productName;
         this.version = version;
-        productFolderDestination = new File(BASE_PATH +
+        remote_productsFolder = new File(BASE_PATH +
                 version +
                 "\\" +
                 productName);
@@ -26,7 +26,7 @@ public class netBrowser {
 
     public File getLatestBuildPath() {
         File path = null;
-        File buildFolder = new File(productFolderDestination, Integer.toString(getLatestBuildNumber()));
+        File buildFolder = new File(remote_productsFolder, Integer.toString(getLatestBuildNumber()));
         File[] files = buildFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -42,20 +42,21 @@ public class netBrowser {
     }
 
     public int getLatestBuildNumber() {
-        File propsFile = new File(productFolderDestination, "latest.properties");
+        File propsFile = new File(remote_productsFolder, "latest.properties");
         Properties props = new Properties();
-        Reader propsInReader=null;
+        Reader propsInReader;
         try {
             propsInReader = new BufferedReader(new FileReader(propsFile));
             props.load(propsInReader);
             propsInReader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Cannot connect to: "+productFolderDestination);
+            System.out.println("Can't find .properties file at: "+ remote_productsFolder);
             e.printStackTrace();
             return 1;
         } catch (IOException e) {
-            System.out.println("ERROR: Error while reading .property file.");
+            System.out.println("Error while reading .property file.");
             e.printStackTrace();
+            return 1;
         }
         String buildNumber = props.getProperty("_b_build");
         return Integer.parseInt(buildNumber);

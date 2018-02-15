@@ -32,7 +32,7 @@ public class MainApp extends Application {
         controller.setMainApp(this);
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
-        System.out.println("MainApp: "+Thread.currentThread().getName());
+
     }
 
     public static void main(String[] args) {

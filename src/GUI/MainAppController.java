@@ -60,6 +60,11 @@ public class MainAppController {
     }
 
     @FXML
+    private void onStop(ActionEvent ev) {
+
+    }
+    DownloadService downloadService;
+    @FXML
     private void onStartBtn(ActionEvent ev) {
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
@@ -67,8 +72,10 @@ public class MainAppController {
         int pollingInterval = getPollInterval();
         File destination = getDestination();
 
-        DownloadService downloadService = new DownloadService(products, version, pollingInterval, destination);
+
+        downloadService = new DownloadService(products, version, pollingInterval, destination, this);
         downloadService.start();
+
     }
 
     @FXML
@@ -76,12 +83,14 @@ public class MainAppController {
         setDestinationField();
     }
 
+
     private void setDestinationField() {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Download builds to..");
         File destinationDirectory = chooser.showDialog(splitPane.getScene().getWindow());
         if (destinationDirectory!=null) {
             destinationDirectoryTextField.setText(destinationDirectory.toString());
+            FSUtil.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
         } else {
             destinationDirectoryTextField.setText(FSUtil.HOMEFS_BUILDS_FOLDER);
         }
@@ -127,9 +136,9 @@ public class MainAppController {
         if (tmp.isEmpty()) {
             destination = new File(FSUtil.HOMEFS_BUILDS_FOLDER);
         } else {
+            FSUtil.HOMEFS_BUILDS_FOLDER = tmp+"\\Builds\\";
             destination = new File(tmp);
         }
-        System.out.println(destination);
         return destination;
     }
 

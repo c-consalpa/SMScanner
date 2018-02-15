@@ -1,82 +1,135 @@
 package Work;
 
 import FSUtils.FSUtil;
+import GUI.MainAppController;
 import javafx.concurrent.Task;
 import netUtils.netBrowser;
 
 import java.io.*;
-import java.nio.file.Path;
 
 public class downloadTask extends Task<String> {
-    private String productName;
-    private String productVersion;
+    private MainAppController controller;
+
     private final String[] products;
+    private String productName;
     private final String version;
-    private final int pollingInterval;
-    private final File destination;
+    int latestBuildNumber;
+    File targetFolderPath;
 
     private File downloadFrom;
     private File downloadTo;
 
-    public downloadTask(String[] products, String version, int pollingInterval, File destination) {
+    public downloadTask(String[] products, String version, MainAppController controller) {
         this.products = products;
         this.version = version;
-        this.pollingInterval = pollingInterval;
-        this.destination = destination;
+        this.controller = controller;
+    }
+
+    @Override
+    protected void succeeded() {
+        super.succeeded();
+
+
     }
 
     @Override
     protected String call() throws Exception {
-        System.out.println(Thread.currentThread().getName());
-        for (String product:
-             products) {
-            System.out.println("IT#");
-            productName = product;
-            productVersion = version;
+        doStuff();
 
-            setBuildParams();
-            downloadData(downloadFrom, downloadTo);
+        return "qsd";
+    }
+
+    private void doStuff() {
+        for (String product: products) {
+            productName = product;
+
+            boolean isUpToDate = setBuildParams();
+            if (!isUpToDate) {
+                cleanupFolder(targetFolderPath);
+                downloadData(downloadFrom, downloadTo);
+                updateCurrentBuildNumber(targetFolderPath, latestBuildNumber);
+            }
         }
-        return "";
+    }
+
+
+    private boolean setBuildParams() {
+        boolean isUpToDate = false;
+        netBrowser netBrowser = new netBrowser(productName, version);
+
+        String latestBuildName = netBrowser.getLatestBuildName();
+        latestBuildNumber = netBrowser.getLatestBuildNumber();
+        int currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, version);
+        targetFolderPath = FSUtil.getTargetFolder(productName, version);
+
+        if (currentBuildNumber >= latestBuildNumber) {
+            System.out.println("Current " + productName + " " + version +
+                    "("+ currentBuildNumber + ")" + " is up-to-date; Skipping download..");
+            isUpToDate = true;
+        } else {
+            downloadTo = new File(targetFolderPath, latestBuildName);
+            downloadFrom = netBrowser.getLatestBuildPath();
+        }
+        return isUpToDate;
     }
 
     private void downloadData(File downloadFrom, File downloadTo) {
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
                 BufferedOutputStream bfOut = new BufferedOutputStream(
-                        new FileOutputStream(downloadTo));
+                        new FileOutputStream(downloadTo))
             ) {
-
-            System.out.println("Downloading from: "+downloadFrom);
             int tmp;
             while((tmp=bfIn.read())!=-1) {
                 bfOut.write(tmp);
             }
             bfOut.flush();
-            System.out.println("File downloaded: ");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("download finished: "+downloadTo);
+
     }
 
-    private void setBuildParams() {
-        netBrowser netBrowser = new netBrowser(productName, productVersion);
+    private void updateCurrentBuildNumber(File targetFolderPath, int latestBuildNumber) {
+        File latestTxt = new File(targetFolderPath, "latest.txt");
+        try (
+                FileWriter fileWriter = new FileWriter(latestTxt);
+        ) {
+            fileWriter.write(Integer.toString(latestBuildNumber));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        int latestBuildNumber = netBrowser.getLatestBuildNumber();
-        String latestBuildName = netBrowser.getLatestBuildName();
-        int currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, productVersion);
-        File targetFolderPath = FSUtil.getTargetFolder(productName, productVersion);
+    }
 
-        downloadTo = new File(targetFolderPath, latestBuildName);
-        downloadFrom = netBrowser.getLatestBuildPath();
 
-        if (currentBuildNumber >= latestBuildNumber) {
-            System.out.println("Current " + productName + " " + productVersion +
-                    "("+ currentBuildNumber + ")" + " is up-to-date");
-            return;
+    public static void cleanupFolder(File targetFolder) {
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        File[] files2Clean = targetFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(FSUtil.FILE_EXTENSION)?true:false;
+            }
+        });
+
+        for (File f :
+                files2Clean) {
+            if (!f.isDirectory()) {
+                f.delete();
+            }
+        }
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
-
 }
