@@ -64,7 +64,7 @@
             <HBox alignment="TOP_RIGHT" layoutX="426.0" layoutY="175.0" prefWidth="156.0" spacing="15.0" AnchorPane.rightAnchor="20.0">
                <children>
                   <Button mnemonicParsing="false" onAction="#onStop" prefWidth="65.0" text="Stop" />
-                  <Button mnemonicParsing="false" onAction="#onStartBtn" prefHeight="25.0" prefWidth="65.0" text="Start" />
+                  <Button fx:id="startBtn" mnemonicParsing="false" onAction="#onStartBtn" prefHeight="25.0" prefWidth="65.0" text="Start" />
                </children>
             </HBox>
             <HBox layoutX="278.0" layoutY="120.0" AnchorPane.rightAnchor="20.0">

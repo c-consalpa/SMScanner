@@ -2,10 +2,12 @@ package Work;
 
 import FSUtils.FSUtil;
 import GUI.MainAppController;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import netUtils.netBrowser;
 
 import java.io.*;
+import java.util.Date;
 
 public class downloadTask extends Task<String> {
     private MainAppController controller;
@@ -23,20 +25,27 @@ public class downloadTask extends Task<String> {
         this.products = products;
         this.version = version;
         this.controller = controller;
+        FSUtil.initHomeFolders(products, version);
+        controller.consoleLog(String.valueOf(new Date()));
     }
 
     @Override
     protected void succeeded() {
         super.succeeded();
+        controller.consoleLog(getValue());
+        controller.consoleLog("*********************************");
+    }
 
+    @Override
+    protected void failed() {
+        super.failed();
 
     }
 
     @Override
     protected String call() throws Exception {
         doStuff();
-
-        return "qsd";
+        return "Task complete";
     }
 
     private void doStuff() {
@@ -63,7 +72,7 @@ public class downloadTask extends Task<String> {
         targetFolderPath = FSUtil.getTargetFolder(productName, version);
 
         if (currentBuildNumber >= latestBuildNumber) {
-            System.out.println("Current " + productName + " " + version +
+            controller.consoleLog("Current " + productName + " " + version +
                     "("+ currentBuildNumber + ")" + " is up-to-date; Skipping download..");
             isUpToDate = true;
         } else {
@@ -74,6 +83,7 @@ public class downloadTask extends Task<String> {
     }
 
     private void downloadData(File downloadFrom, File downloadTo) {
+        controller.consoleLog("Downloading file "+downloadFrom);
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
                 BufferedOutputStream bfOut = new BufferedOutputStream(
@@ -89,7 +99,7 @@ public class downloadTask extends Task<String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("download finished: "+downloadTo);
+        controller.consoleLog("Download finished: "+downloadTo);
 
     }
 

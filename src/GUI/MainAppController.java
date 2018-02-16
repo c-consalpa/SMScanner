@@ -1,15 +1,10 @@
 package GUI;
 
 import FSUtils.FSUtil;
-import GUI.MainApp;
 import Work.DownloadService;
-import Work.downloadTask;
-import javafx.beans.property.SimpleSetProperty;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableIntegerArray;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -17,9 +12,7 @@ import javafx.scene.control.*;
 
 import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import netUtils.PullTask;
-import netUtils.Scheduler;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,8 +22,9 @@ import java.util.List;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
-
     private MainApp mainApp;
+    private DownloadService downloadService;
+
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
@@ -61,9 +55,14 @@ public class MainAppController {
 
     @FXML
     private void onStop(ActionEvent ev) {
-
+        System.out.println(downloadService.getState());
+        startBtn.setDisable(false);
+        downloadService.cancel();
     }
-    DownloadService downloadService;
+
+    @FXML
+    private Button startBtn;
+
     @FXML
     private void onStartBtn(ActionEvent ev) {
         String[] products = new String[getProducts().size()];
@@ -73,9 +72,12 @@ public class MainAppController {
         File destination = getDestination();
 
 
+
         downloadService = new DownloadService(products, version, pollingInterval, destination, this);
+        downloadService.setPeriod(new Duration(10000));
         downloadService.start();
 
+        startBtn.setDisable(true);
     }
 
     @FXML
@@ -147,7 +149,9 @@ public class MainAppController {
     }
 
     public void consoleLog(String s) {
-        consoleTextArea.appendText(s);
-        consoleTextArea.appendText("\r\n");
+        Platform.runLater(() -> {
+            consoleTextArea.appendText(s);
+            consoleTextArea.appendText("\r\n");
+        });
     }
 }
