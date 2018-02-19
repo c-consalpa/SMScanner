@@ -1,14 +1,12 @@
 package GUI;
 
-import FSUtils.FSUtil;
+import Utils.FSUtils;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import netUtils.netBrowser;
 
 import java.io.IOException;
 
@@ -24,7 +22,7 @@ public class MainApp extends Application {
     }
 
     private void initLayout() throws IOException {
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Smart Trading Build Updater");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("SMScanner.fxml"));
         this.root = loader.load();
@@ -32,7 +30,6 @@ public class MainApp extends Application {
         controller.setMainApp(this);
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.show();
-
     }
 
     public static void main(String[] args) {

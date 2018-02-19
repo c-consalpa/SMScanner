@@ -26,10 +26,10 @@
                <children>
                   <Label text="Products" />
                   <CheckBox fx:id="prod_EAM" mnemonicParsing="false" text="EAM" GridPane.rowIndex="1" />
-                  <CheckBox fx:id="prod_XES" mnemonicParsing="false" text="XEServer" GridPane.rowIndex="2" />
-                  <CheckBox fx:id="prod_XESM" mnemonicParsing="false" text="XEServer Manager" GridPane.rowIndex="3" />
-                  <CheckBox fx:id="prod_XEC" mnemonicParsing="false" text="XEConnect" GridPane.rowIndex="4" />
-                  <CheckBox fx:id="prod_SM" mnemonicParsing="false" text="State Management" GridPane.rowIndex="5" />
+                  <CheckBox fx:id="prod_XEServer" mnemonicParsing="false" text="XEServer" GridPane.rowIndex="2" />
+                  <CheckBox fx:id="prod_XESManager" mnemonicParsing="false" text="XEServer Manager" GridPane.rowIndex="3" />
+                  <CheckBox fx:id="prod_XEConnect" mnemonicParsing="false" text="XEConnect" GridPane.rowIndex="4" />
+                  <CheckBox fx:id="prod_StateManagement" mnemonicParsing="false" text="State Management" GridPane.rowIndex="5" />
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

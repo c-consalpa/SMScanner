@@ -1,13 +1,11 @@
 package Work;
 
-import FSUtils.FSUtil;
+import Utils.FSUtils;
 import GUI.MainAppController;
 import javafx.concurrent.ScheduledService;
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
 import java.io.File;
-import java.util.Date;
 
 /**
  * Created by c-consalpa on 2/15/2018.
@@ -25,7 +23,6 @@ public class DownloadService extends ScheduledService<String> {
         this.pollingInterval = pollingInterval;
         this.destination = destination;
         controller = mainAppController;
-//        FSUtil.initHomeFolders(products, version);
     }
 
     @Override
@@ -36,12 +33,14 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        System.out.println("service success");
+        System.out.println("Service successfull");
     }
 
     @Override
     protected void failed() {
         super.failed();
-        System.out.println("servuce FAILed");
+        System.out.println("Service failed");
+
+
     }
 }

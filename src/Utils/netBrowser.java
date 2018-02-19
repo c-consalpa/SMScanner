@@ -1,8 +1,9 @@
-package netUtils;
+package Utils;
 
-import FSUtils.FSUtil;
+import Utils.FSUtils;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -30,40 +31,47 @@ public class netBrowser {
         File[] files = buildFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                if(name.endsWith(FSUtil.FILE_EXTENSION)) {
+                if(name.endsWith(Utils.FSUtils.FILE_EXTENSION)) {
                     return true;
                 } else return false;
             }
         });
         if (files.length>0) {
             path = files[0];
+        } else {
+            try {
+                throw new FileNotFoundException("Can't get latest build path.");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         return path;
     }
 
     public int getLatestBuildNumber() {
+       int buildNumber = 0;
         File propsFile = new File(remote_productsFolder, "latest.properties");
-        Properties props = new Properties();
-        Reader propsInReader;
-        try {
-            propsInReader = new BufferedReader(new FileReader(propsFile));
-            props.load(propsInReader);
-            propsInReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Can't find .properties file at: "+ remote_productsFolder);
-            e.printStackTrace();
-            return 1;
-        } catch (IOException e) {
-            System.out.println("Error while reading .property file.");
-            e.printStackTrace();
+        String tmp = Utils.FSUtils.getBuildNumberFromProps(propsFile, "_b_build");
+       if (!tmp.isEmpty()) {
+           buildNumber = Integer.parseInt(tmp);
+       }
+        return buildNumber;
+    }
+
+    private int getLatestBuildNumberByFolder(File remote_productsFolder) {
+        File remoteProductDirectory = remote_productsFolder;
+        String[] buildFolders = remote_productsFolder.list();
+        if (buildFolders.length==0) {
             return 1;
         }
-        String buildNumber = props.getProperty("_b_build");
-        return Integer.parseInt(buildNumber);
+        Arrays.sort(buildFolders);
+        return Integer.parseInt(buildFolders[buildFolders.length-1]);
     }
 
     public String getLatestBuildName() {
-        return getLatestBuildPath().getName();
+        String latestBuildFileName = "";
+        latestBuildFileName = getLatestBuildPath().getName();
+        return latestBuildFileName;
     }
 
 

@@ -1,6 +1,6 @@
 package GUI;
 
-import FSUtils.FSUtil;
+import Utils.FSUtils;
 import Work.DownloadService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -48,6 +48,9 @@ public class MainAppController {
     private TextArea consoleTextArea;
 
     @FXML
+    private Button startBtn;
+
+    @FXML
     private void initialize() {
         setupVersionChoiceList();
         setupPollChoiceList();
@@ -55,26 +58,22 @@ public class MainAppController {
 
     @FXML
     private void onStop(ActionEvent ev) {
-        System.out.println(downloadService.getState());
-        startBtn.setDisable(false);
         downloadService.cancel();
+        startBtn.setDisable(false);
     }
 
-    @FXML
-    private Button startBtn;
+
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
         String version = getVersion();
-        int pollingInterval = getPollInterval();
+        int pollingInterval = getPollInterval()*60*60*1000;
         File destination = getDestination();
 
-
-
         downloadService = new DownloadService(products, version, pollingInterval, destination, this);
-        downloadService.setPeriod(new Duration(10000));
+        downloadService.setPeriod(new Duration(30000));
         downloadService.start();
 
         startBtn.setDisable(true);
@@ -85,16 +84,15 @@ public class MainAppController {
         setDestinationField();
     }
 
-
     private void setDestinationField() {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Download builds to..");
         File destinationDirectory = chooser.showDialog(splitPane.getScene().getWindow());
         if (destinationDirectory!=null) {
             destinationDirectoryTextField.setText(destinationDirectory.toString());
-            FSUtil.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
+            Utils.FSUtils.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
         } else {
-            destinationDirectoryTextField.setText(FSUtil.HOMEFS_BUILDS_FOLDER);
+            destinationDirectoryTextField.setText(Utils.FSUtils.HOMEFS_BUILDS_FOLDER);
         }
         destinationDirectoryTextField.positionCaret(100);
     }
@@ -118,7 +116,8 @@ public class MainAppController {
         for (Object node:
                 prod_checkBoxes.getChildren()) {
             if  (node instanceof CheckBox && ((CheckBox) node).isSelected()) {
-                l.add(((CheckBox) node).getText());
+                // Getting product name by "prod_..." fx_IDs
+                l.add(((CheckBox) node).getId().substring(5));
             }
         }
         return l;
@@ -136,16 +135,12 @@ public class MainAppController {
         String tmp = destinationDirectoryTextField.getText();
         File destination;
         if (tmp.isEmpty()) {
-            destination = new File(FSUtil.HOMEFS_BUILDS_FOLDER);
+            destination = new File(FSUtils.HOMEFS_BUILDS_FOLDER);
         } else {
-            FSUtil.HOMEFS_BUILDS_FOLDER = tmp+"\\Builds\\";
+            FSUtils.HOMEFS_BUILDS_FOLDER = tmp+"\\Builds\\";
             destination = new File(tmp);
         }
         return destination;
-    }
-
-    public TextArea getConsoleTextArea() {
-        return consoleTextArea;
     }
 
     public void consoleLog(String s) {

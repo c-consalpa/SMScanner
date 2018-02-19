@@ -1,10 +1,9 @@
 package Work;
 
-import FSUtils.FSUtil;
+import Utils.FSUtils;
 import GUI.MainAppController;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
-import netUtils.netBrowser;
+import Utils.netBrowser;
 
 import java.io.*;
 import java.util.Date;
@@ -25,7 +24,7 @@ public class downloadTask extends Task<String> {
         this.products = products;
         this.version = version;
         this.controller = controller;
-        FSUtil.initHomeFolders(products, version);
+        Utils.FSUtils.initHomeFolders(products, version);
         controller.consoleLog(String.valueOf(new Date()));
     }
 
@@ -54,9 +53,9 @@ public class downloadTask extends Task<String> {
 
             boolean isUpToDate = setBuildParams();
             if (!isUpToDate) {
-                cleanupFolder(targetFolderPath);
+                FSUtils.cleanupFolder(targetFolderPath);
                 downloadData(downloadFrom, downloadTo);
-                updateCurrentBuildNumber(targetFolderPath, latestBuildNumber);
+                FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
             }
         }
     }
@@ -66,10 +65,10 @@ public class downloadTask extends Task<String> {
         boolean isUpToDate = false;
         netBrowser netBrowser = new netBrowser(productName, version);
 
-        String latestBuildName = netBrowser.getLatestBuildName();
+        int currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
         latestBuildNumber = netBrowser.getLatestBuildNumber();
-        int currentBuildNumber = FSUtil.getCurrentBuildNumber(productName, version);
-        targetFolderPath = FSUtil.getTargetFolder(productName, version);
+        String latestBuildName = netBrowser.getLatestBuildName();
+        targetFolderPath = Utils.FSUtils.getTargetFolder(productName, version);
 
         if (currentBuildNumber >= latestBuildNumber) {
             controller.consoleLog("Current " + productName + " " + version +
@@ -83,7 +82,7 @@ public class downloadTask extends Task<String> {
     }
 
     private void downloadData(File downloadFrom, File downloadTo) {
-        controller.consoleLog("Downloading file "+downloadFrom);
+        controller.consoleLog("INITIATING DOWNLOAD : "+downloadFrom);
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
                 BufferedOutputStream bfOut = new BufferedOutputStream(
@@ -99,47 +98,6 @@ public class downloadTask extends Task<String> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        controller.consoleLog("Download finished: "+downloadTo);
-
-    }
-
-    private void updateCurrentBuildNumber(File targetFolderPath, int latestBuildNumber) {
-        File latestTxt = new File(targetFolderPath, "latest.txt");
-        try (
-                FileWriter fileWriter = new FileWriter(latestTxt);
-        ) {
-            fileWriter.write(Integer.toString(latestBuildNumber));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    public static void cleanupFolder(File targetFolder) {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        File[] files2Clean = targetFolder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(FSUtil.FILE_EXTENSION)?true:false;
-            }
-        });
-
-        for (File f :
-                files2Clean) {
-            if (!f.isDirectory()) {
-                f.delete();
-            }
-        }
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        controller.consoleLog("DOWNLOADED : "+downloadTo);
     }
 }
