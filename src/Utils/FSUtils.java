@@ -4,24 +4,24 @@ import java.io.*;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import Utils.Common;
 
+import static Utils.Common.*;
 
 
 /**
  * Created by Konstantin on 14.01.2018.
  */
 public class FSUtils {
-    public static String HOMEFS_BUILDS_FOLDER = "D:\\\\Builds\\";
-    public static String FILE_EXTENSION = "pdf";
-    public static String PROPERTY_FILE_NAME = "latest.properties";
-    public static String PROPERTY_BUILD_NUMBER_KEY = "b_version";
+    public static String FS_DELIMITER = "\\";
 
     public static void initHomeFolders(String[] products, String prdctVrsn) {
         for (String productName:
              products) {
             File buildsFolder = new File(HOMEFS_BUILDS_FOLDER +
+                    FS_DELIMITER +
                     prdctVrsn +
-                    "\\" +
+                    FS_DELIMITER +
                     productName);
             if (!buildsFolder.exists()) {
                 buildsFolder.mkdirs();
@@ -38,36 +38,21 @@ public class FSUtils {
 
     public static int getCurrentBuildNumber(String prdctNm, String prdctVrsn) {
         int buildNumber = 0;
-        File dstn = new File(HOMEFS_BUILDS_FOLDER +
-                            "\\" +
+        File propsDstn = new File(HOMEFS_BUILDS_FOLDER +
+                            FS_DELIMITER +
                             prdctVrsn +
-                            "\\" +
+                            FS_DELIMITER +
                             prdctNm +
-                            "\\" +
-                            "latest.properties");
-        getBuildNumberFromProps(dstn, PROPERTY_BUILD_NUMBER_KEY);
-        System.out.println(buildNumber);
+                            FS_DELIMITER +
+                            Common.PROPERTY_FILE_NAME);
+        if (propsDstn.exists()) {
+//           If file not existing - buildNumber=0;
+            buildNumber = Common.getBuildNumberFromProps(propsDstn, Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL);
+        }
+
         return buildNumber;
     }
 
-    public static String getBuildNumberFromProps(File file, String propertyName) {
-        System.out.println(file);
-        String buildNumber = "";
-        Properties props = new Properties();
-        try {
-            FileReader fileReader = new FileReader(file);
-            props.load(fileReader);
-            String tmp = props.getProperty(PROPERTY_BUILD_NUMBER_KEY);
-            if (!tmp.isEmpty()) {
-                buildNumber = tmp;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return buildNumber;
-    }
 
     public static String getVersionInt(String line) {
         String result = "";
@@ -79,21 +64,25 @@ public class FSUtils {
         return result;
     }
 
-    public static File getTargetFolder(String productName, String productVersion) {
-        File targetFolder = new File(HOMEFS_BUILDS_FOLDER +
+    public static File getHomeFolder(String productName, String productVersion) {
+        File HomeProductFolder = new File(Common.HOMEFS_BUILDS_FOLDER +
+                FS_DELIMITER +
                 productVersion +
-                "\\" +
+                FS_DELIMITER +
                 productName +
-                "\\");
-
-        return targetFolder.isDirectory()?targetFolder:null;
+                FS_DELIMITER);
+    if (!HomeProductFolder.exists()) {
+//        Create new folder if it was deleted
+        HomeProductFolder.mkdir();
+    }
+        return HomeProductFolder;
     }
 
-    public static void cleanupFolder(File targetFolder) {
+    public static void cleanupFolders(File targetFolder) {
         File[] files2Clean = targetFolder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name.endsWith(Utils.FSUtils.FILE_EXTENSION)?true:false;
+                return name.endsWith(Utils.Common.FILE_EXTENSION)?true:false;
             }
         });
         for (File f :
@@ -110,7 +99,7 @@ public class FSUtils {
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(new File(targetFolderPath, PROPERTY_FILE_NAME));
-            props.setProperty(PROPERTY_BUILD_NUMBER_KEY, String.valueOf(latestBuildNumber));
+            props.setProperty(Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL, String.valueOf(latestBuildNumber));
             props.store(fileWriter, "Latest downloaded build number");
         } catch (FileNotFoundException e) {
             System.out.println("Cannot update properties file");

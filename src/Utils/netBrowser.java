@@ -15,7 +15,6 @@ public class netBrowser {
     public static String BASE_PATH = "\\\\enbuild06\\Builds\\";
     File remote_productsFolder;
 
-
     public netBrowser(String productName, String version) {
         this.productName = productName;
         this.version = version;
@@ -25,36 +24,15 @@ public class netBrowser {
                 productName);
     }
 
-    public File getLatestBuildPath() {
-        File path = null;
-        File buildFolder = new File(remote_productsFolder, Integer.toString(getLatestBuildNumber()));
-        File[] files = buildFolder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if(name.endsWith(Utils.FSUtils.FILE_EXTENSION)) {
-                    return true;
-                } else return false;
-            }
-        });
-        if (files.length>0) {
-            path = files[0];
-        } else {
-            try {
-                throw new FileNotFoundException("Can't get latest build path.");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        return path;
-    }
-
     public int getLatestBuildNumber() {
-       int buildNumber = 0;
+        int buildNumber = 0;
         File propsFile = new File(remote_productsFolder, "latest.properties");
-        String tmp = Utils.FSUtils.getBuildNumberFromProps(propsFile, "_b_build");
-       if (!tmp.isEmpty()) {
-           buildNumber = Integer.parseInt(tmp);
-       }
+        if (!propsFile.exists()) {
+//            If .properties file cannot be found
+           buildNumber =  getLatestBuildNumberByFolder(remote_productsFolder);
+        } else {
+            buildNumber = Utils.Common.getBuildNumberFromProps(propsFile, Common.PROPERTY_BUILD_NUMBER_KEY);
+        }
         return buildNumber;
     }
 
@@ -68,9 +46,38 @@ public class netBrowser {
         return Integer.parseInt(buildFolders[buildFolders.length-1]);
     }
 
+    public File getLatestBuildPath() throws FileNotFoundException {
+        File path = null;
+        File buildFolder = new File(remote_productsFolder, Integer.toString(getLatestBuildNumber()));
+
+        if (!buildFolder.exists()) {
+            throw new FileNotFoundException("Can't locate file");
+        }
+        File[] files = buildFolder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if(name.endsWith(Utils.Common.FILE_EXTENSION)) {
+                    return true;
+                } else return false;
+            }
+        });
+        if (files.length>0) {
+            path = files[0];
+        } else {
+            System.out.println("Cannot assemble path to artifact");
+            throw new FileNotFoundException("Can't locate file");
+        }
+        return path;
+    }
+
     public String getLatestBuildName() {
-        String latestBuildFileName = "";
-        latestBuildFileName = getLatestBuildPath().getName();
+        String latestBuildFileName = "DEFAULT";
+        try {
+            latestBuildFileName = getLatestBuildPath().getName();
+        } catch (FileNotFoundException e) {
+            System.out.println("Cannot get artifact name; artifact path");
+            e.printStackTrace();
+        }
         return latestBuildFileName;
     }
 

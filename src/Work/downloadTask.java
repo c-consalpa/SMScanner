@@ -6,6 +6,7 @@ import javafx.concurrent.Task;
 import Utils.netBrowser;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 
 public class downloadTask extends Task<String> {
@@ -25,7 +26,7 @@ public class downloadTask extends Task<String> {
         this.version = version;
         this.controller = controller;
         Utils.FSUtils.initHomeFolders(products, version);
-        controller.consoleLog(String.valueOf(new Date()));
+        controller.consoleLog("Starting task: " + String.valueOf(new Date()));
     }
 
     @Override
@@ -33,50 +34,61 @@ public class downloadTask extends Task<String> {
         super.succeeded();
         controller.consoleLog(getValue());
         controller.consoleLog("*********************************");
+        controller.consoleLog("");
     }
 
     @Override
     protected void failed() {
         super.failed();
-
+        System.out.println("TASK FAILED");
+        System.out.println(Arrays.toString(getException().getStackTrace()));
     }
 
     @Override
     protected String call() throws Exception {
         doStuff();
-        return "Task complete";
+        return "TASK COMPLETE";
     }
 
     private void doStuff() {
-        for (String product: products) {
+        for (String product :
+                products) {
             productName = product;
-
+// setBuildParams() gets info required for download and returns bool whether the download is needed;
             boolean isUpToDate = setBuildParams();
-            if (!isUpToDate) {
-                FSUtils.cleanupFolder(targetFolderPath);
-                downloadData(downloadFrom, downloadTo);
-                FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
+            if (isUpToDate) {
+                continue;
             }
+            FSUtils.cleanupFolders(targetFolderPath);
+            downloadData(downloadFrom, downloadTo);
+            FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
         }
     }
 
 
     private boolean setBuildParams() {
         boolean isUpToDate = false;
+
         netBrowser netBrowser = new netBrowser(productName, version);
 
         int currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
         latestBuildNumber = netBrowser.getLatestBuildNumber();
         String latestBuildName = netBrowser.getLatestBuildName();
-        targetFolderPath = Utils.FSUtils.getTargetFolder(productName, version);
+        targetFolderPath = Utils.FSUtils.getHomeFolder(productName, version);
 
         if (currentBuildNumber >= latestBuildNumber) {
             controller.consoleLog("Current " + productName + " " + version +
                     "("+ currentBuildNumber + ")" + " is up-to-date; Skipping download..");
             isUpToDate = true;
         } else {
-            downloadTo = new File(targetFolderPath, latestBuildName);
-            downloadFrom = netBrowser.getLatestBuildPath();
+            try {
+                downloadTo = new File(targetFolderPath, latestBuildName);
+                downloadFrom = netBrowser.getLatestBuildPath();
+            } catch (FileNotFoundException e) {
+                System.out.println("Can't get downloadFrom link. Aborting");
+                e.printStackTrace();
+                isUpToDate = true;
+            }
         }
         return isUpToDate;
     }

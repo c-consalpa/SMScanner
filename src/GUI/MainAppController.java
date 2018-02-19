@@ -1,5 +1,6 @@
 package GUI;
 
+import Utils.Common;
 import Utils.FSUtils;
 import Work.DownloadService;
 import javafx.application.Platform;
@@ -8,6 +9,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 
 import javafx.scene.layout.GridPane;
@@ -66,6 +69,7 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
+        disableUI(splitPane);
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
         String version = getVersion();
@@ -75,8 +79,14 @@ public class MainAppController {
         downloadService = new DownloadService(products, version, pollingInterval, destination, this);
         downloadService.setPeriod(new Duration(30000));
         downloadService.start();
+    }
 
-        startBtn.setDisable(true);
+    private void disableUI(Parent n) {
+        for (Node target:
+             n.getChildrenUnmodifiable()) {
+            System.out.println(target.toString());
+            target.ge
+        }
     }
 
     @FXML
@@ -90,9 +100,9 @@ public class MainAppController {
         File destinationDirectory = chooser.showDialog(splitPane.getScene().getWindow());
         if (destinationDirectory!=null) {
             destinationDirectoryTextField.setText(destinationDirectory.toString());
-            Utils.FSUtils.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
+            Utils.Common.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
         } else {
-            destinationDirectoryTextField.setText(Utils.FSUtils.HOMEFS_BUILDS_FOLDER);
+            destinationDirectoryTextField.setText(Utils.Common.HOMEFS_BUILDS_FOLDER);
         }
         destinationDirectoryTextField.positionCaret(100);
     }
@@ -135,9 +145,9 @@ public class MainAppController {
         String tmp = destinationDirectoryTextField.getText();
         File destination;
         if (tmp.isEmpty()) {
-            destination = new File(FSUtils.HOMEFS_BUILDS_FOLDER);
+            destination = new File(Utils.Common.HOMEFS_BUILDS_FOLDER);
         } else {
-            FSUtils.HOMEFS_BUILDS_FOLDER = tmp+"\\Builds\\";
+            Common.HOMEFS_BUILDS_FOLDER = tmp+"\\Builds\\";
             destination = new File(tmp);
         }
         return destination;
