@@ -39,7 +39,7 @@ public class netBrowser {
     private int getLatestBuildNumberByFolder(File remote_productsFolder) {
         File remoteProductDirectory = remote_productsFolder;
         String[] buildFolders = remote_productsFolder.list();
-        if (buildFolders.length==0) {
+        if (buildFolders.length<1) {
             return 1;
         }
         Arrays.sort(buildFolders);
@@ -64,7 +64,7 @@ public class netBrowser {
         if (files.length>0) {
             path = files[0];
         } else {
-            System.out.println("Cannot assemble path to artifact");
+            System.out.println("Cant get "+ Common.FILE_EXTENSION + " in "+" "+buildFolder);
             throw new FileNotFoundException("Can't locate file");
         }
         return path;

@@ -4,6 +4,7 @@ import Utils.FSUtils;
 import GUI.MainAppController;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
+import javafx.util.Duration;
 
 import java.io.File;
 
@@ -33,7 +34,7 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        System.out.println("Service successfull");
+        controller.consoleLog("task complete");
     }
 
     @Override

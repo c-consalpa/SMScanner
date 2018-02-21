@@ -1,22 +1,33 @@
 package GUI;
 
 import Utils.Common;
-import Utils.FSUtils;
+
 import Work.DownloadService;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +44,19 @@ public class MainAppController {
     }
 
     @FXML
+    private Pane root;
+
+    @FXML
     private SplitPane splitPane;
 
     @FXML
     private GridPane prod_checkBoxes;
+
+    @FXML
+    private GridPane rightGrid;
+
+    @FXML
+    private HBox pathBar;
 
     @FXML
     private ChoiceBox<String> choice_version;
@@ -61,15 +81,49 @@ public class MainAppController {
 
     @FXML
     private void onStop(ActionEvent ev) {
+
         downloadService.cancel();
-        startBtn.setDisable(false);
+        disableUI(false);
     }
 
+    private boolean validateUIFields() {
+        if(getProducts().size()<1) {
+            blinkElement(prod_checkBoxes);
+            return false;
+        } else if (destinationDirectoryTextField.getText().isEmpty()) {
+            blinkElement(pathBar);
+            return false;
+        } else return true;
+    }
 
+    private void blinkElement(Node n) {
+        double nodeWidth = n.getLayoutBounds().getWidth() + 10;
+        double nodeHeight = n.getLayoutBounds().getHeight() + 10;
+        double nodeX = n.getLayoutX() - 5;
+        double nodeY = n.getLayoutY() - 5;
+        Rectangle rectangle = new Rectangle(nodeWidth, nodeHeight);
+        rectangle.setX(nodeX);
+        rectangle.setY(nodeY);
+        rectangle.setFill(Color.TRANSPARENT);
+        rectangle.setStroke(Color.RED);
+        rectangle.setMouseTransparent(true);
+
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.1), rectangle);
+        fadeTransition.setFromValue(1);
+        fadeTransition.setToValue(0);
+        fadeTransition.setCycleCount(4);
+        fadeTransition.play();
+
+
+        root.getChildren().add(rectangle);
+    }
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-        disableUI(splitPane);
+        if(!validateUIFields()) {
+            return;
+        }
+        disableUI(true);
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
         String version = getVersion();
@@ -77,16 +131,15 @@ public class MainAppController {
         File destination = getDestination();
 
         downloadService = new DownloadService(products, version, pollingInterval, destination, this);
-        downloadService.setPeriod(new Duration(30000));
+        downloadService.setPeriod(new Duration(20000));
         downloadService.start();
     }
 
-    private void disableUI(Parent n) {
-        for (Node target:
-             n.getChildrenUnmodifiable()) {
-            System.out.println(target.toString());
-            target.ge
-        }
+    private void disableUI(Boolean b) {
+        prod_checkBoxes.setDisable(b);
+        rightGrid.setDisable(b);
+        pathBar.setDisable(b);
+        startBtn.setDisable(b);
     }
 
     @FXML

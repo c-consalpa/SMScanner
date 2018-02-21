@@ -32,7 +32,7 @@ public class downloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        controller.consoleLog(getValue());
+        controller.consoleLog("succeeded");
         controller.consoleLog("*********************************");
         controller.consoleLog("");
     }
@@ -47,7 +47,7 @@ public class downloadTask extends Task<String> {
     @Override
     protected String call() throws Exception {
         doStuff();
-        return "TASK COMPLETE";
+        return "";
     }
 
     private void doStuff() {

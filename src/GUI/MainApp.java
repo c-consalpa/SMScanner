@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 import javafx.scene.control.SplitPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import java.io.IOException;
 public class MainApp extends Application {
     private Stage primaryStage;
     private MainAppController controller;
-    SplitPane root;
+    Pane root;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -28,7 +29,8 @@ public class MainApp extends Application {
         this.root = loader.load();
         controller = loader.getController();
         controller.setMainApp(this);
-        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
