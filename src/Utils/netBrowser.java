@@ -51,7 +51,7 @@ public class netBrowser {
         File buildFolder = new File(remote_productsFolder, Integer.toString(getLatestBuildNumber()));
 
         if (!buildFolder.exists()) {
-            throw new FileNotFoundException("Can't locate file");
+            throw new FileNotFoundException("Can't locate file. Build folder does not exists: "+ buildFolder);
         }
         File[] files = buildFolder.listFiles(new FilenameFilter() {
             @Override

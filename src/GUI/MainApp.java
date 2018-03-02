@@ -30,6 +30,8 @@ public class MainApp extends Application {
         controller = loader.getController();
         controller.setMainApp(this);
         primaryStage.setScene(new Scene(root));
+        primaryStage.setWidth(608);
+        primaryStage.setHeight(442);
         primaryStage.setResizable(false);
         primaryStage.show();
     }

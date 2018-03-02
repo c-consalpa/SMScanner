@@ -30,7 +30,10 @@ import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import static com.sun.imageio.plugins.jpeg.JPEG.version;
 
 /**
  * Created by c-consalpa on 2/1/2018.
@@ -86,15 +89,6 @@ public class MainAppController {
         disableUI(false);
     }
 
-    private boolean validateUIFields() {
-        if(getProducts().size()<1) {
-            blinkElement(prod_checkBoxes);
-            return false;
-        } else if (destinationDirectoryTextField.getText().isEmpty()) {
-            blinkElement(pathBar);
-            return false;
-        } else return true;
-    }
 
     private void blinkElement(Node n) {
         double nodeWidth = n.getLayoutBounds().getWidth() + 10;
@@ -120,19 +114,26 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-        if(!validateUIFields()) {
+        boolean UIvalidationPassed = validateUIFields(); 
+        if (!UIvalidationPassed) {
             return;
         }
         disableUI(true);
+
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
         String version = getVersion();
-        int pollingInterval = getPollInterval()*60*60*1000;
         File destination = getDestination();
-
-        downloadService = new DownloadService(products, version, pollingInterval, destination, this);
-        downloadService.setPeriod(new Duration(20000));
+        int pollingInterval = getPollInterval();
+        downloadService = new DownloadService(products, version, destination, this);
+        downloadService.setPeriod(Duration.hours(pollingInterval));
+        downloadService.setDelay(Duration.seconds(1));
         downloadService.start();
+    }
+
+    @FXML
+    private void onBrowseBtn(ActionEvent ev) {
+        setDestinationField();
     }
 
     private void disableUI(Boolean b) {
@@ -142,9 +143,14 @@ public class MainAppController {
         startBtn.setDisable(b);
     }
 
-    @FXML
-    private void onBrowseBtn(ActionEvent ev) {
-        setDestinationField();
+    private boolean validateUIFields() {
+        if(getProducts().size()<1) {
+            blinkElement(prod_checkBoxes);
+            return false;
+        } else if (destinationDirectoryTextField.getText().isEmpty()) {
+            blinkElement(pathBar);
+            return false;
+        } else return true;
     }
 
     private void setDestinationField() {
@@ -154,8 +160,6 @@ public class MainAppController {
         if (destinationDirectory!=null) {
             destinationDirectoryTextField.setText(destinationDirectory.toString());
             Utils.Common.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
-        } else {
-            destinationDirectoryTextField.setText(Utils.Common.HOMEFS_BUILDS_FOLDER);
         }
         destinationDirectoryTextField.positionCaret(100);
     }
@@ -207,9 +211,8 @@ public class MainAppController {
     }
 
     public void consoleLog(String s) {
-        Platform.runLater(() -> {
+
             consoleTextArea.appendText(s);
             consoleTextArea.appendText("\r\n");
-        });
     }
 }
