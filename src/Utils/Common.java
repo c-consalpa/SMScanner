@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class Common {
     public static String HOMEFS_BUILDS_FOLDER = "D:\\\\Builds";
-    public static String FILE_EXTENSION = "zip";
+    public static String FILE_EXTENSION = "pdf";
     public static String PROPERTY_FILE_NAME = "latest.properties";
 //    Properties that carry latest version info on local fs/net
     public static String PROPERTY_BUILD_NUMBER_KEY = "_b_build";

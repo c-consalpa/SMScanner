@@ -28,7 +28,6 @@ public class MainApp extends Application {
         loader.setLocation(getClass().getResource("SMScanner.fxml"));
         this.root = loader.load();
         controller = loader.getController();
-        controller.setMainApp(this);
         primaryStage.setScene(new Scene(root));
         primaryStage.setWidth(608);
         primaryStage.setHeight(442);

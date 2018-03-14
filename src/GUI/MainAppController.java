@@ -84,7 +84,6 @@ public class MainAppController {
 
     @FXML
     private void onStop(ActionEvent ev) {
-
         downloadService.cancel();
         disableUI(false);
     }
@@ -126,8 +125,8 @@ public class MainAppController {
         File destination = getDestination();
         int pollingInterval = getPollInterval();
         downloadService = new DownloadService(products, version, destination, this);
-        downloadService.setPeriod(Duration.hours(pollingInterval));
-        downloadService.setDelay(Duration.seconds(1));
+        downloadService.setPeriod(Duration.seconds(pollingInterval));
+
         downloadService.start();
     }
 
@@ -210,8 +209,7 @@ public class MainAppController {
         return destination;
     }
 
-    public void consoleLog(String s) {
-
+    public synchronized void consoleLog(String s) {
             consoleTextArea.appendText(s);
             consoleTextArea.appendText("\r\n");
     }

@@ -26,21 +26,19 @@ public class netBrowser {
 
     public int getLatestBuildNumber() {
         int buildNumber = 0;
-        File propsFile = new File(remote_productsFolder, "latest.properties");
-        if (!propsFile.exists()) {
-//            If .properties file cannot be found
-           buildNumber =  getLatestBuildNumberByFolder(remote_productsFolder);
-        } else {
-            buildNumber = Utils.Common.getBuildNumberFromProps(propsFile, Common.PROPERTY_BUILD_NUMBER_KEY);
-        }
+        buildNumber =  getLatestBuildNumberByFolder(remote_productsFolder);
         return buildNumber;
     }
 
     private int getLatestBuildNumberByFolder(File remote_productsFolder) {
-        File remoteProductDirectory = remote_productsFolder;
-        String[] buildFolders = remote_productsFolder.list();
+        String[] buildFolders = remote_productsFolder.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return new File(dir, name).isDirectory();
+            }
+        });
         if (buildFolders.length<1) {
-            return 1;
+            return 0;
         }
         Arrays.sort(buildFolders);
         return Integer.parseInt(buildFolders[buildFolders.length-1]);
@@ -65,7 +63,7 @@ public class netBrowser {
             path = files[0];
         } else {
             System.out.println("Cant get "+ Common.FILE_EXTENSION + " in "+" "+buildFolder);
-            throw new FileNotFoundException("Can't locate file");
+            throw new FileNotFoundException("Can't locate file:" + path);
         }
         return path;
     }

@@ -32,9 +32,7 @@ public class downloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        controller.consoleLog("succeeded");
-        controller.consoleLog("*********************************");
-        controller.consoleLog("");
+
     }
 
     @Override
@@ -51,6 +49,7 @@ public class downloadTask extends Task<String> {
     }
 
     private void doStuff() {
+
         for (String product :
                 products) {
             productName = product;
@@ -65,10 +64,24 @@ public class downloadTask extends Task<String> {
         }
     }
 
+    private void checkConnection() {
+        System.out.println("Checking connection");
+        File f = new File(netBrowser.BASE_PATH);
+        if (!f.exists()) {
+            try {
+                throw new Exception("Cannot access the server");
+            } catch (Exception e) {
+
+                controller.consoleLog("Cannot access the server. Terminating.");
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     private boolean setBuildParams() {
         boolean isUpToDate = false;
-
+//        checkConnection();
         netBrowser netBrowser = new netBrowser(productName, version);
 
         int currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
