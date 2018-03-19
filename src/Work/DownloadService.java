@@ -32,18 +32,18 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        controller.consoleLog("Download cycle complete..");
+        controller.consoleLog("DOWNLOAD CYCLE COMPLETE");
     }
 
     @Override
     protected void failed() {
         super.failed();
-        System.out.println("Service failed. Reason: "+getException());
+        System.out.println("SERVICE FAILED. REASON: "+getException());
     }
 
     @Override
     protected void cancelled() {
         super.cancelled();
-        System.out.println("Service Cancelled");
+        System.out.println("SERVICE CANCELLED");
     }
 }

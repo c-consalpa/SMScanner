@@ -16,6 +16,7 @@ public class FSUtils {
     public static String FS_DELIMITER = "\\";
 
     public static void initHomeFolders(String[] products, String prdctVrsn) {
+        //TODO do normal .props intialization
         for (String productName:
              products) {
             File buildsFolder = new File(HOMEFS_BUILDS_FOLDER +

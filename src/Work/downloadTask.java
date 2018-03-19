@@ -15,7 +15,8 @@ public class downloadTask extends Task<String> {
     private final String[] products;
     private String productName;
     private final String version;
-    int latestBuildNumber;
+    int latestBuildNumber,
+        currentBuildNumber;
     File targetFolderPath;
 
     private File downloadFrom;
@@ -26,7 +27,12 @@ public class downloadTask extends Task<String> {
         this.version = version;
         this.controller = controller;
         Utils.FSUtils.initHomeFolders(products, version);
+    }
 
+    @Override
+    protected void cancelled() {
+        super.cancelled();
+        System.out.println("TASK CANCELLED");
     }
 
     @Override
@@ -43,7 +49,7 @@ public class downloadTask extends Task<String> {
 
     @Override
     protected String call() {
-        controller.consoleLog("Starting task: " + String.valueOf(new Date()));
+        controller.consoleLog("STARTING TASK: " + String.valueOf(new Date()));
         makeCycle();
         return "";
     }
@@ -62,24 +68,25 @@ public class downloadTask extends Task<String> {
             boolean isUpToDate = setBuildParams();
             if (isUpToDate) continue;
             FSUtils.cleanupFolders(targetFolderPath);
-            downloadData(downloadFrom, downloadTo);
-            FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
+            Boolean downloadResults = downloadData(downloadFrom, downloadTo);
+            if (downloadResults) FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
         }
     }
 
     private void checkConnection() throws IOException {
-        System.out.println("Checking connection..");
+        controller.consoleLog("Checking connection..");
         File f = new File(netBrowser.BASE_PATH);
         if (!f.exists()) {
             throw new IOException("Cannot access the server");
         }
+        controller.consoleLog("Connection OK");
     }
 
     private boolean setBuildParams() {
         boolean isUpToDate = false;
 
         netBrowser netBrowser = new netBrowser(productName, version);
-        int currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
+        currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
         latestBuildNumber = netBrowser.getLatestBuildNumber();
         String latestBuildName = netBrowser.getLatestBuildName();
         targetFolderPath = Utils.FSUtils.getHomeFolder(productName, version);
@@ -93,7 +100,7 @@ public class downloadTask extends Task<String> {
                 downloadTo = new File(targetFolderPath, latestBuildName);
                 downloadFrom = netBrowser.getLatestBuildPath();
             } catch (FileNotFoundException e) {
-                System.out.println("Can't get downloadFrom link. Aborting");
+                controller.consoleLog("Can't get downloadFrom link. Aborting");
                 e.printStackTrace();
                 isUpToDate = true;
             }
@@ -101,7 +108,7 @@ public class downloadTask extends Task<String> {
         return isUpToDate;
     }
 
-    private void downloadData(File downloadFrom, File downloadTo) {
+    private boolean downloadData(File downloadFrom, File downloadTo) {
         controller.consoleLog("INITIATING DOWNLOAD : " + downloadFrom);
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
@@ -109,6 +116,13 @@ public class downloadTask extends Task<String> {
             ) {
             int tmp;
             while((tmp=bfIn.read())!=-1) {
+                if(isCancelled()) {
+                    bfOut.close();
+                    downloadTo.delete();
+                    FSUtils.persistLatestDownload(downloadTo.getParentFile(), currentBuildNumber);
+                    controller.consoleLog("CANCELLING DOWNLOAD: " + downloadFrom);
+                    return false;
+                }
                 bfOut.write(tmp);
             }
             bfOut.flush();
@@ -118,5 +132,6 @@ public class downloadTask extends Task<String> {
             e.printStackTrace();
         }
         controller.consoleLog("DOWNLOADED : "+downloadTo);
+        return true;
     }
 }

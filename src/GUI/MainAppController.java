@@ -39,12 +39,8 @@ import static com.sun.imageio.plugins.jpeg.JPEG.version;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
-    private MainApp mainApp;
-    private DownloadService downloadService;
 
-    public void setMainApp(MainApp mainApp) {
-        this.mainApp = mainApp;
-    }
+    private DownloadService downloadService;
 
     @FXML
     private Pane root;
@@ -84,7 +80,9 @@ public class MainAppController {
 
     @FXML
     private void onStop(ActionEvent ev) {
-        downloadService.cancel();
+        if (downloadService!=null) {
+            downloadService.cancel();
+        }
         disableUI(false);
     }
 
