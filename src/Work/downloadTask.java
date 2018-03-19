@@ -26,7 +26,7 @@ public class downloadTask extends Task<String> {
         this.version = version;
         this.controller = controller;
         Utils.FSUtils.initHomeFolders(products, version);
-        controller.consoleLog("Starting task: " + String.valueOf(new Date()));
+
     }
 
     @Override
@@ -42,7 +42,8 @@ public class downloadTask extends Task<String> {
     }
 
     @Override
-    protected String call() throws Exception {
+    protected String call() {
+        controller.consoleLog("Starting task: " + String.valueOf(new Date()));
         makeCycle();
         return "";
     }

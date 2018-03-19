@@ -125,7 +125,7 @@ public class MainAppController {
         File destination = getDestination();
         int pollingInterval = getPollInterval();
         downloadService = new DownloadService(products, version, destination, this);
-        downloadService.setPeriod(Duration.seconds(pollingInterval));
+        downloadService.setPeriod(Duration.hours(pollingInterval));
 
         downloadService.start();
     }

@@ -17,16 +17,21 @@ public class MainApp extends Application {
     Pane root;
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initLayout();
     }
 
-    private void initLayout() throws IOException {
+    private void initLayout()  {
         primaryStage.setTitle("Smart Trading Build Updater");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("SMScanner.fxml"));
-        this.root = loader.load();
+        try {
+            this.root = loader.load();
+        } catch (IOException e) {
+            System.out.println("Can't load FXML template.");
+            e.printStackTrace();
+        }
         controller = loader.getController();
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
