@@ -38,12 +38,12 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void failed() {
         super.failed();
-        System.out.println("Service failed");
+        System.out.println("Service failed. Reason: "+getException());
     }
 
     @Override
     protected void cancelled() {
         super.cancelled();
-        System.out.println("cancelled");
+        System.out.println("Service Cancelled");
     }
 }

@@ -14,3 +14,8 @@
 .choice-box > * {
     -fx-text-alignment: center;
 }
+
+.text-area, .text-area content {
+    -fx-focus-color: -fx-control-inner-background ;
+       -fx-faint-focus-color: -fx-control-inner-background ;
+}

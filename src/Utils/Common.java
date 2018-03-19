@@ -17,12 +17,12 @@ public class Common {
 
 
 
-    public static int getBuildNumberFromProps(File file, String propertyName) {
+    public static int getBuildNumberFromProps(File propertyFile, String propertyName) {
         int buildNumber = 0;
         Properties props = new Properties();
         FileReader fileReader = null;
         try {
-            fileReader = new FileReader(file);
+            fileReader = new FileReader(propertyFile);
             props.load(fileReader);
             String tmp = props.getProperty(propertyName);
 

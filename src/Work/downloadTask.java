@@ -32,7 +32,6 @@ public class downloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-
     }
 
     @Override
@@ -44,46 +43,41 @@ public class downloadTask extends Task<String> {
 
     @Override
     protected String call() throws Exception {
-        doStuff();
+        makeCycle();
         return "";
     }
 
-    private void doStuff() {
+    private void makeCycle() {
+        try {
+            checkConnection();
+        } catch (IOException e) {
+            controller.consoleLog("Cannot access the server. Terminating cycle.");
+            e.printStackTrace();
+        }
 
-        for (String product :
-                products) {
+        for (String product : products) {
             productName = product;
-// setBuildParams() gets info required for download and returns bool whether the download is needed;
+            // setBuildParams() gets info required for download and returns bool whether the download is needed;
             boolean isUpToDate = setBuildParams();
-            if (isUpToDate) {
-                continue;
-            }
+            if (isUpToDate) continue;
             FSUtils.cleanupFolders(targetFolderPath);
             downloadData(downloadFrom, downloadTo);
             FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
         }
     }
 
-    private void checkConnection() {
-        System.out.println("Checking connection");
+    private void checkConnection() throws IOException {
+        System.out.println("Checking connection..");
         File f = new File(netBrowser.BASE_PATH);
         if (!f.exists()) {
-            try {
-                throw new Exception("Cannot access the server");
-            } catch (Exception e) {
-
-                controller.consoleLog("Cannot access the server. Terminating.");
-                e.printStackTrace();
-            }
+            throw new IOException("Cannot access the server");
         }
     }
 
-
     private boolean setBuildParams() {
         boolean isUpToDate = false;
-//        checkConnection();
-        netBrowser netBrowser = new netBrowser(productName, version);
 
+        netBrowser netBrowser = new netBrowser(productName, version);
         int currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
         latestBuildNumber = netBrowser.getLatestBuildNumber();
         String latestBuildName = netBrowser.getLatestBuildName();
@@ -107,11 +101,10 @@ public class downloadTask extends Task<String> {
     }
 
     private void downloadData(File downloadFrom, File downloadTo) {
-        controller.consoleLog("INITIATING DOWNLOAD : "+downloadFrom);
+        controller.consoleLog("INITIATING DOWNLOAD : " + downloadFrom);
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
-                BufferedOutputStream bfOut = new BufferedOutputStream(
-                        new FileOutputStream(downloadTo))
+                BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(downloadTo))
             ) {
             int tmp;
             while((tmp=bfIn.read())!=-1) {

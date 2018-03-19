@@ -29,9 +29,8 @@ public class MainApp extends Application {
         this.root = loader.load();
         controller = loader.getController();
         primaryStage.setScene(new Scene(root));
-        primaryStage.setWidth(608);
-        primaryStage.setHeight(442);
         primaryStage.setResizable(false);
+        primaryStage.sizeToScene();
         primaryStage.show();
     }
 
