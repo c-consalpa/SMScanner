@@ -1,6 +1,7 @@
 package Utils;
 
 import java.io.*;
+import java.util.Date;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,20 +16,31 @@ import static Utils.Common.*;
 public class FSUtils {
     public static String FS_DELIMITER = "\\";
 
-    public static void initHomeFolders(String[] products, String prdctVrsn) {
+    public static void initHomeFolders(String[] products, String productVersion) {
         //TODO do normal .props intialization
         for (String productName:
              products) {
             File buildsFolder = new File(HOMEFS_BUILDS_FOLDER +
                     FS_DELIMITER +
-                    prdctVrsn +
+                    productVersion +
                     FS_DELIMITER +
                     productName);
             if (!buildsFolder.exists()) {
                 buildsFolder.mkdirs();
-                try {
+
+                    Properties props = new Properties();
+                    props.setProperty("b_version", "0");
+                    String comments = "Latest downloaded "+productName+" build"
+                            + "\r\n"
+                            + new Date().toString();
                     File propsFile = new File(buildsFolder, PROPERTY_FILE_NAME);
-                    propsFile.createNewFile();
+                try {
+                    BufferedOutputStream propsOutStream = new BufferedOutputStream(new FileOutputStream(propsFile));
+                    props.store(propsOutStream, comments);
+                    propsOutStream.flush();
+                    propsOutStream.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
