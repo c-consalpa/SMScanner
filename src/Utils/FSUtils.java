@@ -17,7 +17,6 @@ public class FSUtils {
     public static String FS_DELIMITER = "\\";
 
     public static void initHomeFolders(String[] products, String productVersion) {
-        //TODO do normal .props intialization
         for (String productName:
              products) {
             File buildsFolder = new File(HOMEFS_BUILDS_FOLDER +
@@ -30,14 +29,11 @@ public class FSUtils {
 
                     Properties props = new Properties();
                     props.setProperty("b_version", "0");
-                    String comments = "Latest downloaded "+productName+" build"
-                            + "\r\n"
-                            + new Date().toString();
+                    String comments = "Dummy build number";
                     File propsFile = new File(buildsFolder, PROPERTY_FILE_NAME);
                 try {
-                    BufferedOutputStream propsOutStream = new BufferedOutputStream(new FileOutputStream(propsFile));
+                    FileOutputStream propsOutStream = new FileOutputStream(propsFile);
                     props.store(propsOutStream, comments);
-                    propsOutStream.flush();
                     propsOutStream.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -66,17 +62,6 @@ public class FSUtils {
         return buildNumber;
     }
 
-
-    public static String getVersionInt(String line) {
-        String result = "";
-        Pattern pattern = Pattern.compile("\\d{3,}$");
-        Matcher matcher = pattern.matcher(line);
-        if (matcher.find()) {
-            result = matcher.group(0);
-        }
-        return result;
-    }
-
     public static File getHomeFolder(String productName, String productVersion) {
         File HomeProductFolder = new File(Common.HOMEFS_BUILDS_FOLDER +
                 FS_DELIMITER +
@@ -92,11 +77,13 @@ public class FSUtils {
     }
 
     public static void cleanupFolders(File targetFolder) {
-        File[] files2Clean = targetFolder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(Utils.Common.FILE_EXTENSION)?true:false;
+        File[] files2Clean = targetFolder.listFiles((dir, name) -> {
+            for (int i = 0; i < Common.FILE_EXTENSION.length; i++) {
+                if(name.endsWith(Common.FILE_EXTENSION[i])) {
+                    return true;
+                }
             }
+            return false;
         });
         for (File f :
                 files2Clean) {
@@ -108,27 +95,18 @@ public class FSUtils {
 
     public static void persistLatestDownload(File targetFolderPath, int latestBuildNumber) {
         Properties props = new Properties();
-
-        FileWriter fileWriter = null;
         try {
-            fileWriter = new FileWriter(new File(targetFolderPath, PROPERTY_FILE_NAME));
+            FileOutputStream propsOutputStream = new FileOutputStream(
+                    new File(targetFolderPath, Common.PROPERTY_FILE_NAME));
             props.setProperty(Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL, String.valueOf(latestBuildNumber));
-            props.store(fileWriter, "Latest downloaded build number");
+            props.store(propsOutputStream, "Latest downloaded "+targetFolderPath.toString()+" build;");
         } catch (FileNotFoundException e) {
-            System.out.println("Cannot update properties file");
-            e.printStackTrace();
+            System.out.println("CANT PERSIST LATEST BUILD NUMBER. CANT FIND PROPERTY FILE AT "+targetFolderPath);
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fileWriter!=null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            System.out.println("CANT WRITE TO PROPERTY FILE AT "+targetFolderPath);
         }
-
     }
+
+
 
 }

@@ -11,6 +11,7 @@ import java.io.File;
 /**
  * Created by c-consalpa on 2/15/2018.
  */
+//// TODO: 3/21/2018 check if cancel() terminates service looping 
 public class DownloadService extends ScheduledService<String> {
     private final String[] products;
     private final String version;
