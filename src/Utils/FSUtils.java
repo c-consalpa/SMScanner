@@ -14,7 +14,7 @@ import static Utils.Common.*;
  * Created by Konstantin on 14.01.2018.
  */
 public class FSUtils {
-    public static String FS_DELIMITER = "\\";
+
 
     public static void initHomeFolders(String[] products, String productVersion) {
         for (String productName:
@@ -29,7 +29,7 @@ public class FSUtils {
 
                     Properties props = new Properties();
                     props.setProperty("b_version", "0");
-                    String comments = "Dummy build number";
+                    String comments = String.format(Common.propsFileTemplate, productName);
                     File propsFile = new File(buildsFolder, PROPERTY_FILE_NAME);
                 try {
                     FileOutputStream propsOutStream = new FileOutputStream(propsFile);
@@ -56,9 +56,8 @@ public class FSUtils {
                             Common.PROPERTY_FILE_NAME);
         if (propsDstn.exists()) {
 //           If file not existing - buildNumber=0;
-            buildNumber = Common.getBuildNumberFromProps(propsDstn, Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL);
+            buildNumber = Common.getBuildNumberFromProps(propsDstn, PROPERTY_BUILD_NUMBER_KEY_LOCAL);
         }
-
         return buildNumber;
     }
 
@@ -93,20 +92,19 @@ public class FSUtils {
         }
     }
 
-    public static void persistLatestDownload(File targetFolderPath, int latestBuildNumber) {
+    public static void persistLatestDownload(File targetFolderPath, String productName, int latestBuildNumber) {
         Properties props = new Properties();
         try {
             FileOutputStream propsOutputStream = new FileOutputStream(
                     new File(targetFolderPath, Common.PROPERTY_FILE_NAME));
-            props.setProperty(Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL, String.valueOf(latestBuildNumber));
-            props.store(propsOutputStream, "Latest downloaded "+targetFolderPath.toString()+" build;");
+            String comments = String.format(Common.propsFileTemplate, targetFolderPath);
+            props.setProperty(PROPERTY_BUILD_NUMBER_KEY_LOCAL, String.valueOf(latestBuildNumber));
+            props.store(propsOutputStream, comments);
         } catch (FileNotFoundException e) {
             System.out.println("CANT PERSIST LATEST BUILD NUMBER. CANT FIND PROPERTY FILE AT "+targetFolderPath);
         } catch (IOException e) {
             System.out.println("CANT WRITE TO PROPERTY FILE AT "+targetFolderPath);
         }
     }
-
-
 
 }

@@ -11,9 +11,9 @@ public class netBrowser {
     private File remote_productsFolder;
     public netBrowser(String productName, String version) {
         remote_productsFolder = new File(Common.BASE_PATH +
-                FSUtils.FS_DELIMITER +
+                Common.FS_DELIMITER +
                 version +
-                FSUtils.FS_DELIMITER +
+                Common.FS_DELIMITER +
                 productName);
     }
 

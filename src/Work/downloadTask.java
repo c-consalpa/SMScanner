@@ -71,7 +71,7 @@ public class downloadTask extends Task<String> {
 
             FSUtils.cleanupFolders(targetFolderPath);
             Boolean downloadSuccess = downloadData(downloadFrom, downloadTo);
-            if (downloadSuccess) FSUtils.persistLatestDownload(targetFolderPath, latestBuildNumber);
+            if (downloadSuccess) FSUtils.persistLatestDownload(targetFolderPath, productName, latestBuildNumber);
         }
     }
 
@@ -99,6 +99,10 @@ public class downloadTask extends Task<String> {
         currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
         latestBuildNumber = netBrowser.getLatestBuildNumber();
         File latestBuildURL = netBrowser.getLatestBuildPath(latestBuildNumber);
+        if(latestBuildURL==null) {
+            controller.consoleLog("Cannot find matching files in the folder");
+            return;
+        }
         String latestBuildName = latestBuildURL.getName();
         targetFolderPath = Utils.FSUtils.getHomeFolder(productName, version);
 
@@ -116,10 +120,10 @@ public class downloadTask extends Task<String> {
             int tmp;
             while((tmp=bfIn.read())!=-1) {
                 if(isCancelled()) {
-//TODO downloadCancel();
+//TODO do cheaper cancelling
                     bfOut.close();
                     downloadTo.delete();
-                    FSUtils.persistLatestDownload(downloadTo.getParentFile(), currentBuildNumber);
+                    FSUtils.persistLatestDownload(downloadTo.getParentFile(), productName, currentBuildNumber);
                     controller.consoleLog("CANCELLING DOWNLOAD: " + downloadFrom);
                     return false;
                 }
