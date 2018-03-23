@@ -11,7 +11,7 @@ public class Common {
     static final String[] FILE_EXTENSION = {"pdf", "exe"};
     static final String PROPERTY_FILE_NAME = "latest.properties";
     public static final String BASE_PATH = "\\\\enbuild06\\Builds";
-    static final String FS_DELIMITER = "\\";
+    public static final String FS_DELIMITER = "\\";
     //    Properties that carry latest version info on local fs/net
     static final String PROPERTY_BUILD_NUMBER_KEY_LOCAL = "b_version";
     public static final String propsFileTemplate = "Last downloaded %s build;";

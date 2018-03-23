@@ -12,16 +12,10 @@ import java.util.Date;
 
 public class downloadTask extends Task<String> {
     private MainAppController controller;
-
     private final String[] products;
-    private String productName;
     private final String version;
-    int latestBuildNumber,
-        currentBuildNumber;
-    File targetFolderPath;
 
-    private File downloadFrom;
-    private File downloadTo;
+
 
     public downloadTask(String[] products, String version, MainAppController controller) {
         this.products = products;
@@ -64,27 +58,25 @@ public class downloadTask extends Task<String> {
         }
 
         for (String product : products) {
-            productName = product;
-            getDownloadParams();
-            boolean isUpToDate = checkBuildsUpToDate();
-            if (isUpToDate) continue;
+            DProduct dProduct = new DProduct(product, version);
+            int latestBuildNumber = dProduct.getRemoteBuildNumber();
+            int currentBuildBumber = FSUtils.getCurrentBuildNumber(product, version);
+            if (currentBuildBumber == latestBuildNumber) {
+                controller.consoleLog("Current " + product + " " + version +
+                                     "(" + currentBuildBumber + ")" + " is up-to-date; Skipping download..");
+                continue;
+            } else {
+                FSUtils.cleanupFolders();
+            }
 
-            FSUtils.cleanupFolders(targetFolderPath);
-            Boolean downloadSuccess = downloadData(downloadFrom, downloadTo);
-            if (downloadSuccess) FSUtils.persistLatestDownload(targetFolderPath, productName, latestBuildNumber);
+
+
+
         }
     }
 
-    private boolean checkBuildsUpToDate() {
-        boolean isUpToDate = false;
-        if (currentBuildNumber >= latestBuildNumber) {
-            controller.consoleLog("Current " + productName + " " + version +
-                    "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
-            isUpToDate = true;
-        }
-        return isUpToDate;
-    }
 
+//
     private void checkConnection() throws IOException {
         controller.consoleLog("Checking connection..");
         File f = new File(Common.BASE_PATH);
@@ -93,49 +85,49 @@ public class downloadTask extends Task<String> {
         }
         controller.consoleLog("Connection OK");
     }
-
-    private void getDownloadParams() {
-        netBrowser netBrowser = new netBrowser(productName, version);
-        currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
-        latestBuildNumber = netBrowser.getLatestBuildNumber();
-        File latestBuildURL = netBrowser.getLatestBuildPath(latestBuildNumber);
-        if(latestBuildURL==null) {
-            controller.consoleLog("Cannot find matching files in the folder");
-            return;
-        }
-        String latestBuildName = latestBuildURL.getName();
-        targetFolderPath = Utils.FSUtils.getHomeFolder(productName, version);
-
-                downloadTo = new File(targetFolderPath, latestBuildName);
-                downloadFrom = latestBuildURL;
-
-        }
-
-    private boolean downloadData(File downloadFrom, File downloadTo) {
-        controller.consoleLog("INITIATING DOWNLOAD : " + downloadFrom);
-        try (
-                BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
-                BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(downloadTo))
-            ) {
-            int tmp;
-            while((tmp=bfIn.read())!=-1) {
-                if(isCancelled()) {
-//TODO do cheaper cancelling
-                    bfOut.close();
-                    downloadTo.delete();
-                    FSUtils.persistLatestDownload(downloadTo.getParentFile(), productName, currentBuildNumber);
-                    controller.consoleLog("CANCELLING DOWNLOAD: " + downloadFrom);
-                    return false;
-                }
-                bfOut.write(tmp);
-            }
-            bfOut.flush();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        controller.consoleLog("DOWNLOADED : "+downloadTo);
-        return true;
-    }
+//
+//    private void getDownloadParams() {
+//        netBrowser netBrowser = new netBrowser(productName, version);
+//        currentBuildNumber = Utils.FSUtils.getCurrentBuildNumber(productName, version);
+//        latestBuildNumber = netBrowser.getLatestBuildNumber();
+//        File latestBuildURL = netBrowser.getLatestBuildPath(latestBuildNumber);
+//        if(latestBuildURL==null) {
+//            controller.consoleLog("Cannot find matching files in the folder");
+//            return;
+//        }
+//        String latestBuildName = latestBuildURL.getName();
+//        targetFolderPath = Utils.FSUtils.getHomeFolder(productName, version);
+//
+//                downloadTo = new File(targetFolderPath, latestBuildName);
+//                downloadFrom = latestBuildURL;
+//
+//        }
+//
+//    private boolean downloadData(File downloadFrom, File downloadTo) {
+//        controller.consoleLog("INITIATING DOWNLOAD : " + downloadFrom);
+//        try (
+//                BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(downloadFrom));
+//                BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(downloadTo))
+//            ) {
+//            int tmp;
+//            while((tmp=bfIn.read())!=-1) {
+//                if(isCancelled()) {
+////TODO do cheaper cancelling
+//                    bfOut.close();
+//                    downloadTo.delete();
+//                    FSUtils.persistLatestDownload(downloadTo.getParentFile(), productName, currentBuildNumber);
+//                    controller.consoleLog("CANCELLING DOWNLOAD: " + downloadFrom);
+//                    return false;
+//                }
+//                bfOut.write(tmp);
+//            }
+//            bfOut.flush();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        controller.consoleLog("DOWNLOADED : "+downloadTo);
+//        return true;
+//    }
 }
