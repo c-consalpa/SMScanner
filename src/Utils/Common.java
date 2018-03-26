@@ -8,9 +8,10 @@ import java.util.Properties;
 
 public class Common {
     public static String HOMEFS_BUILDS_FOLDER = "D:\\\\Builds";
-    static final String[] FILE_EXTENSION = {"pdf", "exe"};
+    public static final String[] FILE_EXTENSION = {"txt"};
     static final String PROPERTY_FILE_NAME = "latest.properties";
-    public static final String BASE_PATH = "\\\\enbuild06\\Builds";
+//    public static final String BASE_PATH = "\\\\enbuild06\\Builds";
+    public static final String BASE_PATH = "D:\\emulated";
     public static final String FS_DELIMITER = "\\";
     //    Properties that carry latest version info on local fs/net
     static final String PROPERTY_BUILD_NUMBER_KEY_LOCAL = "b_version";
@@ -54,4 +55,6 @@ public class Common {
         }
         return buildNumber;
     }
+
+
 }

@@ -60,13 +60,18 @@ public class downloadTask extends Task<String> {
         for (String product : products) {
             DProduct dProduct = new DProduct(product, version);
             int latestBuildNumber = dProduct.getRemoteBuildNumber();
-            int currentBuildBumber = FSUtils.getCurrentBuildNumber(product, version);
-            if (currentBuildBumber == latestBuildNumber) {
+            int currentBuildNumber = FSUtils.getCurrentBuildNumber(product, version);
+            if (currentBuildNumber == latestBuildNumber) {
                 controller.consoleLog("Current " + product + " " + version +
-                                     "(" + currentBuildBumber + ")" + " is up-to-date; Skipping download..");
+                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
                 continue;
             } else {
-                FSUtils.cleanupFolders();
+                FSUtils.cleanupFolders(product, version);
+                File from = dProduct.getFromURL(latestBuildNumber);
+                String productFileName = from.getName();
+                File to = dProduct.getToURL(productFileName);
+
+                download(from, to);
             }
 
 
@@ -75,8 +80,27 @@ public class downloadTask extends Task<String> {
         }
     }
 
+    private void download(File from, File to) {
+        controller.consoleLog("INITIATING DOWNLOAD : " + from);
+        try (
+                BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
+                BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
+        ) {
+            int tmp;
+            while ((tmp = bfIn.read()) != -1) {
+                bfOut.write(tmp);
+                System.out.println("tick");
+            }
+            bfOut.flush();
+        } catch (IOException e) {
 
-//
+            e.printStackTrace();
+        }
+        System.out.println("downloaded;");
+    }
+
+
+    //
     private void checkConnection() throws IOException {
         controller.consoleLog("Checking connection..");
         File f = new File(Common.BASE_PATH);

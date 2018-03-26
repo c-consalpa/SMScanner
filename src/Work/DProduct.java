@@ -3,45 +3,76 @@ package Work;
 import Utils.Common;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import static Utils.Common.FS_DELIMITER;
 
 /**
  * Created by c-consalpa on 3/23/2018.
  */
 public class DProduct {
-    private File ProductsRemoteFolder ;
+    private File productsRemoteFolder;
+    private File productsHomeFolder;
 
     public DProduct(String product, String version) {
-            ProductsRemoteFolder = new File(Common.BASE_PATH +
+        productsRemoteFolder = new File(Common.BASE_PATH +
                     Common.FS_DELIMITER +
                     version +
                     Common.FS_DELIMITER +
                     product);
+
+        productsHomeFolder = new File(Common.HOMEFS_BUILDS_FOLDER +
+                FS_DELIMITER +
+                version +
+                FS_DELIMITER +
+                product +
+                FS_DELIMITER);
     }
 
     public int getRemoteBuildNumber() {
-        if (ProductsRemoteFolder==null) {
+        int biggestnum = 0;
+        if (productsRemoteFolder ==null) {
             System.out.println("Cannot get builds list;");
-            return 0;
+            return biggestnum;
         }
-        File[] buildnumberFolders = ProductsRemoteFolder.listFiles((dir, name) -> {
-            if (name.matches("\\d+")) return true;
-            return false;
-        });
-        if(buildnumberFolders.length==0) {
-            System.out.println("Cannot get remote build version");
-            return 0;
-        } else {
-            Arrays.sort(buildnumberFolders);
-            String latestBuildFolderName = buildnumberFolders[buildnumberFolders.length-1].getName();
-            return Integer.parseInt(latestBuildFolderName);
+        String[] buildnumberFolders = productsRemoteFolder.list();
+        for (String buildnumberFolder:
+             buildnumberFolders) {
+            if (buildnumberFolder.matches("\\d+") && (Integer.parseInt(buildnumberFolder) > biggestnum)) {
+                biggestnum = Integer.parseInt(buildnumberFolder);
+            }
         }
+        return biggestnum;
     }
 
 
+    public File getFromURL(int buildNumber) {
+        File remoteFolder = new File(productsRemoteFolder, String.valueOf(buildNumber));
+        if (!remoteFolder.exists()) {
+            System.out.println("Can't locate remote build folder.");
+            return null;
+        }
+        File from = pickSuitableFile(remoteFolder.listFiles());
+        return from;
+    }
+
+    private File pickSuitableFile(File[] folder) {
+//searches folder if there a file with ending with string from Common.EXTENSIONS
+        for (int i = 0; i < folder.length; i++) {
+            for (int j = 0; j < Common.FILE_EXTENSION.length; j++) {
+                if (folder[i].toString().endsWith(Common.FILE_EXTENSION[j])){
+                    System.out.println("File found: "+folder[i]);
+                    return new File(String.valueOf(folder[i]));
+                }
+            }
+        }
+        System.out.println("No matching files found");
+        return null;
+    }
+
+    public File getToURL(String productFileName) {
+        if (!productsHomeFolder.exists()) {
+            productsHomeFolder.mkdir();
+        }
+        return new File(productsHomeFolder, productFileName);
+    }
 }

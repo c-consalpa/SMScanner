@@ -7,6 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import Utils.Common;
 
+import javax.rmi.CORBA.Util;
+
 import static Utils.Common.*;
 
 
@@ -14,7 +16,6 @@ import static Utils.Common.*;
  * Created by Konstantin on 14.01.2018.
  */
 public class FSUtils {
-
 
     public static void initHomeFolders(String[] products, String productVersion) {
         for (String productName:
@@ -75,8 +76,11 @@ public class FSUtils {
         return HomeProductFolder;
     }
 
-    public static void cleanupFolders(File targetFolder) {
-        File[] files2Clean = targetFolder.listFiles((dir, name) -> {
+    public static void cleanupFolders(String product, String version) {
+        File homeBuildsFolder = new File(Common.HOMEFS_BUILDS_FOLDER);
+        if (!homeBuildsFolder.exists()) return;
+
+        File[] files2Clean = homeBuildsFolder.listFiles((dir, name) -> {
             for (int i = 0; i < Common.FILE_EXTENSION.length; i++) {
                 if(name.endsWith(Common.FILE_EXTENSION[i])) {
                     return true;
