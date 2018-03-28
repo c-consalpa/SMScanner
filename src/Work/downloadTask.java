@@ -82,15 +82,10 @@ public class downloadTask extends Task<String> {
 
     private boolean downloadFiles(File from, File to) {
         controller.consoleLog("INITIATING DOWNLOAD : " + from);
-        if (!to.getParentFile().exists()) {
-            to.mkdirs();
-        }
         long startTime = 0;
         long endTime = 0;
-
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
-
                 BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
         ) {
             int tmp;
@@ -123,7 +118,7 @@ public class downloadTask extends Task<String> {
         if (elapsed/1000/60 >= 1) sb.append((int) elapsed/1000/60 + " minutes ");
         if (elapsed/1000 >= 1) sb.append((int) elapsed/1000 + " seconds ");
 
-        controller.consoleLog(sb.toString());
+        System.out.println(sb.toString());
 
     }
 
