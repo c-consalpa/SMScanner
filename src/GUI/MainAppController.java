@@ -42,6 +42,10 @@ public class MainAppController {
 
     private DownloadService downloadService;
 
+    public DownloadService getDownloadService() {
+        return downloadService;
+    }
+
     @FXML
     private Pane root;
 
@@ -210,5 +214,10 @@ public class MainAppController {
     public synchronized void consoleLog(String s) {
             consoleTextArea.appendText(s);
             consoleTextArea.appendText("\r\n");
+    }
+
+    public void admitAndDisappear() {
+        downloadService.cancel();
+        System.exit(1);
     }
 }
