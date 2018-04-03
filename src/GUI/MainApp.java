@@ -8,6 +8,8 @@ import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -21,6 +23,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Optional;
 
 
 import static javax.swing.text.html.HTML.Tag.I;
@@ -37,10 +40,10 @@ public class MainApp extends Application {
     public void stop() throws Exception {
         super.stop();
         if(controller.getDownloadService()==null) {
-            System.exit(0);
         } else {
-            controller.admitAndDisappear();
+            controller.terminateDownloads();
         }
+        System.exit(0);
     }
 
     @Override
@@ -65,25 +68,18 @@ public class MainApp extends Application {
         primaryStage.sizeToScene();
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("res\\GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
-
-
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent we) {
-                primaryStage.hide();
-
-                addAppToTray(hiddenFirstTime);
-                hiddenFirstTime=false;
-                isHidden=true;
-                we.consume();
-            }
+        primaryStage.setOnCloseRequest(we -> {
+            primaryStage.hide();
+            if (SystemTray.isSupported()) addAppToTray(hiddenFirstTime);
+            hiddenFirstTime=false;
+            isHidden=true;
+            we.consume();
         });
-
         primaryStage.show();
     }
 
     private void addAppToTray(boolean hiddenFirstTime) {
-        if(SystemTray.isSupported()) {
-            java.awt.SystemTray tray = java.awt.SystemTray.getSystemTray();
+            SystemTray tray = SystemTray.getSystemTray();
             java.awt.Image image = null;
             try {
                 image = ImageIO.read(this.getClass().getResourceAsStream("res\\GetBuildsIcon.png"));
@@ -91,24 +87,19 @@ public class MainApp extends Application {
                 e.printStackTrace();
             }
 
-            MenuItem menuItems[] = new MenuItem[2];
-            menuItems[0] = new MenuItem("Quit");
-            menuItems[0].addActionListener(e -> {
-                Platform.exit();
+            MenuItem menuItemQuit = new MenuItem("Quit");
+            menuItemQuit.addActionListener(e -> {
+                promptConfirmation();
             });
-            menuItems[1] = new MenuItem("Restore");
-            menuItems[1].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-
-                    if (isHidden) Platform.runLater(() -> primaryStage.show());
-                    tray.remove(tray.getTrayIcons()[0]);
-                }
+            MenuItem menuItemRestore= new MenuItem("Restore");
+            menuItemRestore.addActionListener(e -> {
+                if (isHidden) Platform.runLater(() -> primaryStage.show());
+                tray.remove(tray.getTrayIcons()[0]);
             });
             PopupMenu pMenu = new PopupMenu();
-            pMenu.add(menuItems[0]);
-            pMenu.add(menuItems[1]);
-            java.awt.TrayIcon trayIcon = new java.awt.TrayIcon(image, "test", pMenu );
+            pMenu.add(menuItemRestore);
+            pMenu.add(menuItemQuit);
+            TrayIcon trayIcon = new TrayIcon(image, "test", pMenu );
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
@@ -118,6 +109,23 @@ public class MainApp extends Application {
                 trayIcon.displayMessage("Daemon", "Keeps working in background", TrayIcon.MessageType.INFO);
             }
         }
+
+    private void promptConfirmation() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Quit?");
+                alert.setHeaderText("Do you want to quit?");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    Platform.exit();
+                } else {
+                    return;
+                }
+            }
+        });
+
     }
 
     public static void main(String[] args) {

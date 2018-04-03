@@ -39,9 +39,7 @@ import static com.sun.imageio.plugins.jpeg.JPEG.version;
  * Created by c-consalpa on 2/1/2018.
  */
 public class MainAppController {
-
     private DownloadService downloadService;
-
     public DownloadService getDownloadService() {
         return downloadService;
     }
@@ -90,35 +88,9 @@ public class MainAppController {
         disableUI(false);
     }
 
-
-    private void blinkElement(Node n) {
-        double nodeWidth = n.getLayoutBounds().getWidth() + 10;
-        double nodeHeight = n.getLayoutBounds().getHeight() + 10;
-        double nodeX = n.getLayoutX() - 5;
-        double nodeY = n.getLayoutY() - 5;
-        Rectangle rectangle = new Rectangle(nodeWidth, nodeHeight);
-        rectangle.setX(nodeX);
-        rectangle.setY(nodeY);
-        rectangle.setFill(Color.TRANSPARENT);
-        rectangle.setStroke(Color.RED);
-        rectangle.setMouseTransparent(true);
-
-        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.1), rectangle);
-        fadeTransition.setFromValue(1);
-        fadeTransition.setToValue(0);
-        fadeTransition.setCycleCount(4);
-        fadeTransition.play();
-
-
-        root.getChildren().add(rectangle);
-    }
-
     @FXML
     private void onStartBtn(ActionEvent ev) {
-        boolean UIvalidationPassed = validateUIFields(); 
-        if (!UIvalidationPassed) {
-            return;
-        }
+        if (!validateUIFields()) return;
         disableUI(true);
 
         String[] products = new String[getProducts().size()];
@@ -127,8 +99,7 @@ public class MainAppController {
         File destination = getDestination();
         int pollingInterval = getPollInterval();
         downloadService = new DownloadService(products, version, destination, this);
-        downloadService.setPeriod(Duration.seconds(pollingInterval));
-
+        downloadService.setPeriod(Duration.hours(pollingInterval));
         downloadService.start();
     }
 
@@ -152,6 +123,28 @@ public class MainAppController {
             blinkElement(pathBar);
             return false;
         } else return true;
+    }
+
+    private void blinkElement(Node n) {
+        double nodeWidth = n.getLayoutBounds().getWidth() + 10;
+        double nodeHeight = n.getLayoutBounds().getHeight() + 10;
+        double nodeX = n.getLayoutX() - 5;
+        double nodeY = n.getLayoutY() - 5;
+        Rectangle rectangle = new Rectangle(nodeWidth, nodeHeight);
+        rectangle.setX(nodeX);
+        rectangle.setY(nodeY);
+        rectangle.setFill(Color.TRANSPARENT);
+        rectangle.setStroke(Color.RED);
+        rectangle.setMouseTransparent(true);
+
+        FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.1), rectangle);
+        fadeTransition.setFromValue(1);
+        fadeTransition.setToValue(0);
+        fadeTransition.setCycleCount(4);
+        fadeTransition.play();
+
+
+        root.getChildren().add(rectangle);
     }
 
     private void setDestinationField() {
@@ -216,8 +209,8 @@ public class MainAppController {
             consoleTextArea.appendText("\r\n");
     }
 
-    public void admitAndDisappear() {
+
+    public void terminateDownloads() {
         downloadService.cancel();
-        System.exit(1);
     }
 }

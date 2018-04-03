@@ -8,10 +8,6 @@ import javafx.util.Duration;
 
 import java.io.File;
 
-/**
- * Created by c-consalpa on 2/15/2018.
- */
-//// TODO: 3/21/2018 check if cancel() terminates service looping 
 public class DownloadService extends ScheduledService<String> {
     private final String[] products;
     private final String version;
@@ -22,6 +18,7 @@ public class DownloadService extends ScheduledService<String> {
         this.products = products;
         this.version = version;
         this.destination = destination;
+
         controller = mainAppController;
     }
 
@@ -45,7 +42,9 @@ public class DownloadService extends ScheduledService<String> {
 
     @Override
     protected void cancelled() {
+
         super.cancelled();
+
         System.out.println("SERVICE CANCELLED");
     }
 }
