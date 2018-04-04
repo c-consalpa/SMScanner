@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
@@ -209,8 +210,19 @@ public class MainAppController {
             consoleTextArea.appendText("\r\n");
     }
 
-
-    public void terminateDownloads() {
-        downloadService.cancel();
+    public void terminateAndQuit() {
+        DownloadService service =  getDownloadService();
+        if (service.getState().equals(Worker.State.RUNNING)) {
+            service.cancel();
+//            giving time to cleanup non-finished builds;
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.exit(0);
+        }
     }
+
+
 }

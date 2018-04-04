@@ -24,7 +24,6 @@ public class downloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-
     }
 
     @Override
@@ -91,6 +90,7 @@ public class downloadTask extends Task<String> {
             startTime = System.currentTimeMillis();
             while ((tmp = bfIn.read()) != -1) {
                 if (isCancelled()) {
+                    bfOut.flush();
                     controller.consoleLog("Task cancelled. Removing file: " + to);
                     bfOut.close();
                     to.delete();
@@ -106,8 +106,10 @@ public class downloadTask extends Task<String> {
         endTime = System.currentTimeMillis();
         controller.consoleLog("Downloaded file: "+to);
         printElapsedTime(endTime-startTime);
+
         return true;
     }
+
 
     private void printElapsedTime(long elapsed) {
         StringBuffer sb = new StringBuffer();

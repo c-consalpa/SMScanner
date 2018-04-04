@@ -1,32 +1,23 @@
 package GUI;
 
-import Utils.FSUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.SplitPane;
+
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import javax.imageio.ImageIO;
-
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Optional;
 
-
-import static javax.swing.text.html.HTML.Tag.I;
 
 public class MainApp extends Application {
     private Stage primaryStage;
@@ -38,12 +29,14 @@ public class MainApp extends Application {
 
     @Override
     public void stop() throws Exception {
-        super.stop();
-        if(controller.getDownloadService()==null) {
+        if (null!=controller.getDownloadService()) {
+            controller.terminateAndQuit();
+            System.out.println("not null");
         } else {
-            controller.terminateDownloads();
+//            System.exit(0);
         }
-        System.exit(0);
+        super.stop();
+
     }
 
     @Override
