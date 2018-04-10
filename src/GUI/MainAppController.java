@@ -91,7 +91,7 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-        if (!validateUIFields()) return;
+        //if (!validateUIFields()) return;
         disableUI(true);
 
         String[] products = new String[getProducts().size()];
@@ -223,4 +223,5 @@ public class MainAppController {
         }
             System.exit(0);
     }
+
 }

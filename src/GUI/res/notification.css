@@ -1,0 +1,12 @@
+.root {
+	-fx-background: #A0D2DB;
+}
+
+.label {
+	-fx-font: normal bold 16px Verdana;
+}
+
+.textBox {
+    -fx-font: normal normal 14px Verdana;
+    -fx-wrap-text: true;
+}

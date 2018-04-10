@@ -1,8 +1,10 @@
 package Work;
 
+import GUI.MNotification;
 import Utils.Common;
 import Utils.FSUtils;
 import GUI.MainAppController;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import java.io.*;
@@ -43,7 +45,15 @@ public class downloadTask extends Task<String> {
     @Override
     protected String call() {
         controller.consoleLog("STARTING TASK: " + String.valueOf(new Date()));
-        makeCycle();
+//        makeCycle();
+        Platform.runLater(() -> {
+            try {
+                MNotification mNotification = new MNotification("Edifecs_Application_Manager_201812315351.exe", String.valueOf(123));
+                mNotification.show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         return "";
     }
 
@@ -70,7 +80,12 @@ public class downloadTask extends Task<String> {
                 boolean downloadOK = downloadFiles(remoteFile, localFile);
                 if (downloadOK) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
-//                    new
+
+//                    Platform.runLater(() -> {
+//                        MNotification mNotification = new MNotification(product, String.valueOf(latestBuildNumber));
+//                        mNotification.show();
+//                    });
+
                 }
             }
         }
@@ -105,9 +120,8 @@ public class downloadTask extends Task<String> {
             return false;
         }
         endTime = System.currentTimeMillis();
-        controller.consoleLog("Downloaded file: "+to);
-        printElapsedTime(endTime-startTime);
-
+        controller.consoleLog("Downloaded file: " + to);
+        printElapsedTime(endTime - startTime);
         return true;
     }
 
