@@ -70,6 +70,7 @@ public class downloadTask extends Task<String> {
                 boolean downloadOK = downloadFiles(remoteFile, localFile);
                 if (downloadOK) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
+//                    new
                 }
             }
         }

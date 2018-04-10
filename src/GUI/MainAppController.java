@@ -211,18 +211,16 @@ public class MainAppController {
     }
 
     public void terminateAndQuit() {
-        DownloadService service =  getDownloadService();
-        if (service.getState().equals(Worker.State.RUNNING)) {
-            service.cancel();
+        if (downloadService == null) System.exit(0);
+        if (downloadService.getState().equals(Worker.State.RUNNING)) {
+            downloadService.cancel();
 //            giving time to cleanup non-finished builds;
             try {
-                Thread.sleep(5);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.exit(0);
         }
+            System.exit(0);
     }
-
-
 }

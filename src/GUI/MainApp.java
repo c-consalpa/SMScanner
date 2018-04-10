@@ -28,15 +28,13 @@ public class MainApp extends Application {
 
 
     @Override
-    public void stop() throws Exception {
-        if (null!=controller.getDownloadService()) {
-            controller.terminateAndQuit();
-            System.out.println("not null");
-        } else {
-//            System.exit(0);
+    public void stop() {
+        try {
+            super.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        super.stop();
-
+        controller.terminateAndQuit();
     }
 
     @Override
