@@ -1,8 +1,10 @@
 package Work;
 
+import GUI.MNotification;
 import Utils.Common;
 import Utils.FSUtils;
 import GUI.MainAppController;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import java.io.*;
@@ -70,7 +72,15 @@ public class downloadTask extends Task<String> {
                 boolean downloadOK = downloadFiles(remoteFile, localFile);
                 if (downloadOK) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
-//                    new
+                    Platform.runLater(() -> {
+                        try {
+                            MNotification mNotification = new MNotification(product, String.valueOf(latestBuildNumber), localFile.getParentFile());
+                            mNotification.show();
+                        } catch (IOException e) {
+                            System.out.println("Can't componse notification stage;");
+                            e.printStackTrace();
+                        }
+                    });
                 }
             }
         }
@@ -105,9 +115,8 @@ public class downloadTask extends Task<String> {
             return false;
         }
         endTime = System.currentTimeMillis();
-        controller.consoleLog("Downloaded file: "+to);
-        printElapsedTime(endTime-startTime);
-
+        controller.consoleLog("Downloaded file: " + to);
+        printElapsedTime(endTime - startTime);
         return true;
     }
 
