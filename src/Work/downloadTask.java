@@ -45,15 +45,7 @@ public class downloadTask extends Task<String> {
     @Override
     protected String call() {
         controller.consoleLog("STARTING TASK: " + String.valueOf(new Date()));
-//        makeCycle();
-        Platform.runLater(() -> {
-            try {
-                MNotification mNotification = new MNotification("Edifecs_Application_Manager_201812315351.exe", String.valueOf(123));
-                mNotification.show();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        makeCycle();
         return "";
     }
 
@@ -80,12 +72,15 @@ public class downloadTask extends Task<String> {
                 boolean downloadOK = downloadFiles(remoteFile, localFile);
                 if (downloadOK) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
-
-//                    Platform.runLater(() -> {
-//                        MNotification mNotification = new MNotification(product, String.valueOf(latestBuildNumber));
-//                        mNotification.show();
-//                    });
-
+                    Platform.runLater(() -> {
+                        try {
+                            MNotification mNotification = new MNotification(product, String.valueOf(latestBuildNumber), localFile.getParentFile());
+                            mNotification.show();
+                        } catch (IOException e) {
+                            System.out.println("Can't componse notification stage;");
+                            e.printStackTrace();
+                        }
+                    });
                 }
             }
         }

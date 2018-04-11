@@ -17,34 +17,42 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox layoutX="15.0" layoutY="14.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="15.0">
+      <HBox alignment="CENTER" focusTraversable="true" prefHeight="17.0" prefWidth="350.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
          <children>
-            <Label layoutX="14.0" layoutY="14.0" text="New builds downloaded:" AnchorPane.bottomAnchor="69.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="14.0">
-               <font>
-                  <Font name="Arabic Typesetting" size="14.0" />
-               </font>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </Label>
+            <Label layoutX="14.0" layoutY="14.0" prefWidth="350.0" text="New builds downloaded:" AnchorPane.bottomAnchor="69.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="14.0">
+                  </Label>
+            <ImageView fx:id="imageView" fitHeight="16.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@Close-Window-icon.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
          </children>
       </HBox>
-      <HBox layoutX="15.0" layoutY="42.0" styleClass="textBox" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="50.0">
+      <VBox focusTraversable="true" layoutX="15.0" layoutY="15.0" spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
          <children>
-            <Text fx:id="nproductName" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="300.0">
-               <HBox.margin>
-                  <Insets right="16.0" />
-               </HBox.margin></Text>
-            <Text fx:id="nproductVersion" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <HBox layoutX="15.0" layoutY="42.0" prefWidth="17.0" styleClass="textBox" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="50.0">
+               <children>
+                  <Text fx:id="nproductName" strokeType="OUTSIDE" strokeWidth="0.0">
+                     <HBox.margin>
+                        <Insets right="15.0" />
+                     </HBox.margin>
+                  </Text>
+                  <Text fx:id="nproductVersion1" strokeType="OUTSIDE" strokeWidth="0.0" text="#" textAlignment="RIGHT" />
+                  <Text fx:id="nproductVersion" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="RIGHT" />
+               </children>
+            </HBox>
+            <HBox alignment="TOP_RIGHT" prefHeight="17.0" styleClass="textBox">
+               <children>
+                  <Text fx:id="openProductLink" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="notificationLink" text="Open Folder" textAlignment="JUSTIFY">
+                     <HBox.margin>
+                     </HBox.margin>
+                  </Text>
+               </children>
+            </HBox>
          </children>
-      </HBox>
-      <ImageView fx:id="imageView" fitHeight="16.0" fitWidth="18.0" layoutX="270.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
-         <image>
-            <Image url="@Close-Window-icon.png" />
-         </image>
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor>
-      </ImageView>
+      </VBox>
    </children>
 </AnchorPane>

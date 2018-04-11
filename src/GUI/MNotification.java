@@ -18,17 +18,36 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 
 public class MNotification {
-    String productName, buildNumber;
-    private final Stage notificationStage;
+    @FXML
+    private ImageView imageView;
 
-    public MNotification(String pName, String bNumber) {
+    @FXML
+    private Text nproductName;
+
+    @FXML
+    private Text nproductVersion;
+
+    @FXML
+    private Text openProductLink;
+
+    private final String productName, buildNumber;
+    private final Stage notificationStage;
+    private final File dir2showInExplorer;
+
+    public MNotification(String pName, String bNumber, File dir2show) {
         productName = pName;
         buildNumber = bNumber;
+        dir2showInExplorer = dir2show;
+
         notificationStage = new Stage(StageStyle.TRANSPARENT);
+        notificationStage.setAlwaysOnTop(true);
+        notificationStage.sizeToScene();
     }
 
     public void show () throws IOException {
@@ -38,26 +57,30 @@ public class MNotification {
         AnchorPane root = fxmlLoader.load();
         nproductName.setText(productName);
         nproductVersion.setText(buildNumber);
-//        image doesnt load itself bitch
+//        image doesn't load  bitch
         Image quitImg = new Image("GUI/res/Close-Window-icon.png");
         imageView.setImage(quitImg);
         imageView.setOnMouseClicked(event ->
-                notificationStage.close());
+                closeStageAnimated(notificationStage));
+        openProductLink.setOnMouseClicked(event ->
+        {
+            try {
+                showBuildInExplorer(dir2showInExplorer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         final Scene scene = new Scene(root);
         scene.setFill(null);
-        scene.getStylesheets().add(getClass().getResource("res\\notification.css").toExternalForm());
-
+        scene.getStylesheets().add(getClass().getResource(
+                "res\\notification.css").toExternalForm());
 
         notificationStage.setScene(scene);
         positionNotificationStage(notificationStage);
+
         notificationStage.show();
         //shifting root element +300px leftwards
-        root.setLayoutX(400);
-
-        //popup effect
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), root);
-        translateTransition.setByX(-402d);
-        translateTransition.play();
+        root.setLayoutX(+ 400d);
 
         //Stage life duration
         PauseTransition delay = new PauseTransition(Duration.seconds(5));
@@ -67,6 +90,16 @@ public class MNotification {
         );
         delay.play();
 
+        //popup effect
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), root);
+        translateTransition.setByX(-402d);
+        translateTransition.play();
+
+    }
+
+    private void showBuildInExplorer(File dir) throws IOException {
+        Desktop desktop = Desktop.getDesktop();
+        desktop.open(dir);
     }
 
     private void closeStageAnimated(Stage notificationStage) {
@@ -80,6 +113,7 @@ public class MNotification {
 
         sequentialTransition.getChildren().add(translateTransition1);
         sequentialTransition.getChildren().add(translateTransition2);
+        sequentialTransition.setOnFinished(event -> notificationStage.close());
         sequentialTransition.play();
     }
 
@@ -96,12 +130,4 @@ public class MNotification {
         nStage.setY(screenHeight - notificationHeight - 2);
     }
 
-    @FXML
-    private ImageView imageView;
-
-    @FXML
-    private Text nproductName;
-
-    @FXML
-    private Text nproductVersion;
 }
