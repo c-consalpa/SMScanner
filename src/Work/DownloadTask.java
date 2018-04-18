@@ -6,17 +6,20 @@ import Utils.FSUtils;
 import GUI.MainAppController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-
 import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-public class downloadTask extends Task<String> {
+public class DownloadTask extends Task<String> {
     private MainAppController controller;
     private final String[] products;
     private final String version;
+    //This field is queries by mainApp to get what is currently downloading;
+    private String currentlyDownloadedBuild;
 
-    public downloadTask(String[] products, String version, MainAppController controller) {
+    public DownloadTask(String[] products, String version, MainAppController controller) {
         this.products = products;
         this.version = version;
         this.controller = controller;
@@ -56,6 +59,7 @@ public class downloadTask extends Task<String> {
             controller.consoleLog("Cannot access the server. Terminating cycle.");
         }
         for (String product : products) {
+            currentlyDownloadedBuild = product;
             DProduct dProduct = new DProduct(product, version);
             int latestBuildNumber = dProduct.getRemoteBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
@@ -68,9 +72,8 @@ public class downloadTask extends Task<String> {
                 File remoteFile = dProduct.getDownloadFromURL(latestBuildNumber);
                 String productFileName = remoteFile.getName();
                 File localFile = dProduct.getToURL(productFileName);
-
-                boolean downloadOK = downloadFiles(remoteFile, localFile);
-                if (downloadOK) {
+                boolean downloadSuccessfull = downloadFiles(remoteFile, localFile);
+                if (downloadSuccessfull) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
                     Platform.runLater(() -> {
                         try {
@@ -126,7 +129,7 @@ public class downloadTask extends Task<String> {
         sb.append("Elapsed time: ");
         if (elapsed/1000/60/60 >= 1) sb.append((int) elapsed/1000/60/60 + " hours ");
         if (elapsed/1000/60 >= 1) sb.append((int) elapsed/1000/60 + " minutes ");
-        if (elapsed/1000 >= 1) sb.append((int) elapsed/1000 + " seconds ");
+        if (elapsed/1000 >= 1) sb.append((int) elapsed/1000%60 + " seconds ");
 
         controller.consoleLog(sb.toString());
 
@@ -141,4 +144,7 @@ public class downloadTask extends Task<String> {
         controller.consoleLog("Connection OK");
     }
 
+    public String getCurrentlyDownloadedBuild() {
+        return currentlyDownloadedBuild;
+    }
 }
