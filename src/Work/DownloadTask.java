@@ -9,8 +9,7 @@ import javafx.concurrent.Task;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class DownloadTask extends Task<String> {
     private MainAppController controller;
@@ -53,12 +52,15 @@ public class DownloadTask extends Task<String> {
     }
 
     private void makeCycle() {
+
         try {
             checkConnection();
         } catch (IOException e) {
             controller.consoleLog("Cannot access the server. Terminating cycle.");
         }
         for (String product : products) {
+//            if a product download is cancelled, no need to waste time with others in products[]:
+            if (isCancelled()) continue;
             currentlyDownloadedBuild = product;
             DProduct dProduct = new DProduct(product, version);
             int latestBuildNumber = dProduct.getRemoteBuildNumber();
@@ -104,15 +106,14 @@ public class DownloadTask extends Task<String> {
             startTime = System.currentTimeMillis();
             while ((tmp = bfIn.read()) != -1) {
                 if (isCancelled()) {
-                    bfOut.flush();
-                    controller.consoleLog("Task cancelled. Removing file: " + to);
+//                    bfOut.flush();
                     bfOut.close();
                     to.delete();
+                    controller.consoleLog("Task cancelled. Removing file: " + to);
                     return false;
                 }
                 bfOut.write(tmp);
             }
-            bfOut.flush();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

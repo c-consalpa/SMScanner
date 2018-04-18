@@ -212,7 +212,7 @@ public class MainAppController {
             downloadService.cancel();
 //            giving time to cleanup non-finished builds;
             try {
-                Thread.sleep(50);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
