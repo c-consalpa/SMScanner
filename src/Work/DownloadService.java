@@ -13,7 +13,7 @@ public class DownloadService extends ScheduledService<String> {
     private final String version;
     private final File destination;
     MainAppController controller;
-    public downloadTask currentTask = null;
+    public DownloadTask currentTask = null;
 
     public DownloadService(String[] products, String version, File destination, MainAppController mainAppController) {
         this.products = products;
@@ -25,7 +25,7 @@ public class DownloadService extends ScheduledService<String> {
 
     @Override
     protected Task createTask() {
-        currentTask = new downloadTask(products, version, controller);
+        currentTask = new DownloadTask(products, version, controller);
         return currentTask;
     }
 
@@ -47,7 +47,6 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void cancelled() {
         super.cancelled();
-
         System.out.println("SERVICE CANCELLED");
     }
 }

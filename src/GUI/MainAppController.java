@@ -3,53 +3,39 @@ package GUI;
 import Utils.Common;
 
 import Work.DownloadService;
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
-import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-
-import javafx.geometry.Insets;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.util.Duration;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import static com.sun.imageio.plugins.jpeg.JPEG.version;
-
-/**
- * Created by c-consalpa on 2/1/2018.
- */
 public class MainAppController {
     private DownloadService downloadService;
+
     public DownloadService getDownloadService() {
         return downloadService;
     }
 
     @FXML
-    private Pane root;
+    private AnchorPane root;
 
-    @FXML
-    private SplitPane splitPane;
 
     @FXML
     private GridPane prod_checkBoxes;
@@ -82,8 +68,13 @@ public class MainAppController {
     }
 
     @FXML
+    private void clearConsole() {
+        consoleTextArea.clear();
+    }
+
+    @FXML
     private void onStop(ActionEvent ev) {
-        if (downloadService!=null) {
+        if (downloadService != null) {
             downloadService.cancel();
         }
         disableUI(false);
@@ -117,7 +108,7 @@ public class MainAppController {
     }
 
     private boolean validateUIFields() {
-        if(getProducts().size()<1) {
+        if (getProducts().size() < 1) {
             blinkElement(prod_checkBoxes);
             return false;
         } else if (destinationDirectoryTextField.getText().isEmpty()) {
@@ -127,13 +118,18 @@ public class MainAppController {
     }
 
     private void blinkElement(Node n) {
-        double nodeWidth = n.getLayoutBounds().getWidth() + 10;
-        double nodeHeight = n.getLayoutBounds().getHeight() + 10;
-        double nodeX = n.getLayoutX() - 5;
-        double nodeY = n.getLayoutY() - 5;
-        Rectangle rectangle = new Rectangle(nodeWidth, nodeHeight);
-        rectangle.setX(nodeX);
-        rectangle.setY(nodeY);
+        //Get ccords relative to Scene:
+        Bounds boundsInScene = n.localToScene(n.getBoundsInLocal());
+        double rectWidth = boundsInScene.getWidth() + 10;
+        double rectHeight = boundsInScene.getHeight() + 10;
+        double rectX = boundsInScene.getMinX() - 5;
+        double rectY = boundsInScene.getMinY() - 5;
+        System.out.println(rectWidth);
+        System.out.println(rectHeight);
+
+        Rectangle rectangle = new Rectangle(rectWidth, rectHeight);
+        rectangle.setX(rectX);
+        rectangle.setY(rectY);
         rectangle.setFill(Color.TRANSPARENT);
         rectangle.setStroke(Color.RED);
         rectangle.setMouseTransparent(true);
@@ -151,10 +147,10 @@ public class MainAppController {
     private void setDestinationField() {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Download builds to..");
-        File destinationDirectory = chooser.showDialog(splitPane.getScene().getWindow());
-        if (destinationDirectory!=null) {
+        File destinationDirectory = chooser.showDialog(root.getScene().getWindow());
+        if (destinationDirectory != null) {
             destinationDirectoryTextField.setText(destinationDirectory.toString());
-            Utils.Common.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString()+"\\Builds\\";
+            Utils.Common.HOMEFS_BUILDS_FOLDER = destinationDirectory.toString() + "\\Builds\\";
         }
         destinationDirectoryTextField.positionCaret(100);
     }
@@ -163,11 +159,11 @@ public class MainAppController {
         String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0"};
         ObservableList<String> versionObsList = FXCollections.observableArrayList(versionsArr);
         choice_version.setItems(versionObsList);
-        choice_version.getSelectionModel().select(versionObsList.size()-1);
+        choice_version.getSelectionModel().select(versionObsList.size() - 1);
     }
 
     private void setupPollChoiceList() {
-        Integer[] intervalArr = new Integer[] {3, 6, 9, 12, 24, 48};
+        Integer[] intervalArr = new Integer[]{3, 6, 9, 12, 24, 48};
         ObservableList pollIntervalList = FXCollections.observableArrayList(intervalArr);
         choice_poll.setItems(pollIntervalList);
         choice_poll.getSelectionModel().select(pollIntervalList.indexOf(24));
@@ -175,9 +171,9 @@ public class MainAppController {
 
     private List<String> getProducts() {
         List<String> l = new ArrayList<>(5);
-        for (Object node:
+        for (Object node :
                 prod_checkBoxes.getChildren()) {
-            if  (node instanceof CheckBox && ((CheckBox) node).isSelected()) {
+            if (node instanceof CheckBox && ((CheckBox) node).isSelected()) {
                 // Getting product name by "prod_..." fx_IDs
                 l.add(((CheckBox) node).getId().substring(5));
             }
@@ -199,15 +195,15 @@ public class MainAppController {
         if (tmp.isEmpty()) {
             destination = new File(Utils.Common.HOMEFS_BUILDS_FOLDER);
         } else {
-            Common.HOMEFS_BUILDS_FOLDER = tmp+"\\Builds\\";
+            Common.HOMEFS_BUILDS_FOLDER = tmp + "\\Builds\\";
             destination = new File(tmp);
         }
         return destination;
     }
 
     public synchronized void consoleLog(String s) {
-            consoleTextArea.appendText(s);
-            consoleTextArea.appendText("\r\n");
+        consoleTextArea.appendText(s);
+        consoleTextArea.appendText("\r\n");
     }
 
     public void terminateAndQuit() {
@@ -216,12 +212,27 @@ public class MainAppController {
             downloadService.cancel();
 //            giving time to cleanup non-finished builds;
             try {
-                Thread.sleep(10);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-            System.exit(0);
+        System.exit(0);
     }
 
+    public boolean taskIsActive() {
+        DownloadService activeService = getDownloadService();
+        if (activeService != null && activeService.getState().equals(Worker.State.RUNNING)) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getCurrentlyDownloadingBuild() {
+        if (downloadService!=null) {
+            return downloadService.currentTask.getCurrentlyDownloadedBuild();
+        } else {
+            return null;
+        }
+    }
 }

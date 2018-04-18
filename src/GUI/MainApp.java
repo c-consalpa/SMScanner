@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -22,8 +23,7 @@ import java.util.Optional;
 public class MainApp extends Application {
     private Stage primaryStage;
     private MainAppController controller;
-    Pane root;
-    private boolean hiddenFirstTime = true;
+    AnchorPane root;
     private boolean isHidden = true;
 
 
@@ -44,9 +44,9 @@ public class MainApp extends Application {
     }
 
     private void initLayout() {
-        primaryStage.setTitle("Smart Trading Build Updater");
+        primaryStage.setTitle("Build Puller");
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("SMScanner.fxml"));
+        loader.setLocation(getClass().getResource("SM_Scanner.fxml"));
         try {
             this.root = loader.load();
         } catch (IOException e) {
@@ -61,15 +61,21 @@ public class MainApp extends Application {
         Platform.setImplicitExit(false);
         primaryStage.setOnCloseRequest(we -> {
             primaryStage.hide();
-            if (SystemTray.isSupported()) addAppToTray(hiddenFirstTime);
-            hiddenFirstTime=false;
-            isHidden=true;
-            we.consume();
+            if (SystemTray.isSupported() && controller.taskIsActive()) {
+                String currentlyDownloadingBuildName = controller.getCurrentlyDownloadingBuild();
+                addAppToTray(currentlyDownloadingBuildName);
+
+                isHidden=true;
+                we.consume();
+            } else {
+                Platform.exit();
+            }
+
         });
         primaryStage.show();
     }
 
-    private void addAppToTray(boolean hiddenFirstTime) {
+    private void addAppToTray(String currentlyDownloadingBuildName) {
             SystemTray tray = SystemTray.getSystemTray();
             java.awt.Image image = null;
             try {
@@ -77,10 +83,9 @@ public class MainApp extends Application {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
             MenuItem menuItemQuit = new MenuItem("Quit");
             menuItemQuit.addActionListener(e -> {
-                promptConfirmation();
+                promptConfirmation(currentlyDownloadingBuildName);
             });
             MenuItem menuItemRestore= new MenuItem("Restore");
             menuItemRestore.addActionListener(e -> {
@@ -90,27 +95,31 @@ public class MainApp extends Application {
             PopupMenu pMenu = new PopupMenu();
             pMenu.add(menuItemRestore);
             pMenu.add(menuItemQuit);
-            TrayIcon trayIcon = new TrayIcon(image, "test", pMenu );
+            TrayIcon trayIcon = new TrayIcon(image, "Currently downloading...", pMenu );
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
                 e.printStackTrace();
             }
-            if(hiddenFirstTime) {
-                trayIcon.displayMessage("Daemon", "Keeps working in background", TrayIcon.MessageType.INFO);
+            String trayNotificationMessage = "Build is currently downloading";
+            if (currentlyDownloadingBuildName!=null) {
+                trayNotificationMessage += (": " + currentlyDownloadingBuildName);
             }
+            trayIcon.displayMessage("Running in daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
         }
 
-    private void promptConfirmation() {
+    private void promptConfirmation(String currentlyDownloadingBuildName) {
+        final String activeDownloadingBuildName = currentlyDownloadingBuildName;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Quit?");
-                alert.setHeaderText("Do you want to quit?");
+                alert.setHeaderText("Do you really want to quit?");
+                alert.setContentText("The following build is currently downloading: " + activeDownloadingBuildName);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK){
-                    Platform.exit();
+                    controller.terminateAndQuit();
                 } else {
                     return;
                 }
