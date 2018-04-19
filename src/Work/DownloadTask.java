@@ -57,7 +57,9 @@ public class DownloadTask extends Task<String> {
             checkConnection();
         } catch (IOException e) {
             controller.consoleLog("Cannot access the server. Terminating cycle.");
+            return;
         }
+
         for (String product : products) {
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;

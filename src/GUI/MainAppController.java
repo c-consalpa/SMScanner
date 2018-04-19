@@ -118,14 +118,12 @@ public class MainAppController {
     }
 
     private void blinkElement(Node n) {
-        //Get ccords relative to Scene:
+        //Get abs coords:
         Bounds boundsInScene = n.localToScene(n.getBoundsInLocal());
         double rectWidth = boundsInScene.getWidth() + 10;
         double rectHeight = boundsInScene.getHeight() + 10;
         double rectX = boundsInScene.getMinX() - 5;
         double rectY = boundsInScene.getMinY() - 5;
-        System.out.println(rectWidth);
-        System.out.println(rectHeight);
 
         Rectangle rectangle = new Rectangle(rectWidth, rectHeight);
         rectangle.setX(rectX);
@@ -139,7 +137,6 @@ public class MainAppController {
         fadeTransition.setToValue(0);
         fadeTransition.setCycleCount(4);
         fadeTransition.play();
-
 
         root.getChildren().add(rectangle);
     }

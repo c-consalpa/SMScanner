@@ -29,12 +29,10 @@ public class Common {
             fileReader = new FileReader(propertyFile);
             props.load(fileReader);
             String tmp = props.getProperty(propertyName);
-
             if(tmp==null) {
 //                Quit if the PROPERTY_BUILD_NUMBER_KEY prop does not exist;
                 return buildNumber;
             }
-
             if (!tmp.isEmpty()) {
                 buildNumber = Integer.parseInt(tmp);
             }

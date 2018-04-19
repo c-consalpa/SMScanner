@@ -48,14 +48,7 @@ public class MainApp extends Application {
     private void initLayout() {
         primaryStage.setTitle("Build Puller");
         FXMLLoader loader = new FXMLLoader();
-        try {
-            URL loc = new URL(this.getClass().getResource("GUI/res/SM_Scanner.fxml").toExternalForm());
-            System.out.println(loc);
-            loader.setLocation(loc);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-//        loader.setLocation(getClass().getResource("GUI\\res\\SM_Scanner.fxml"));
+        loader.setLocation(this.getClass().getResource("GUI/res/SM_Scanner.fxml"));
         try {
             this.root = loader.load();
         } catch (IOException e) {
