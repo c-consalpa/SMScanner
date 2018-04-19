@@ -1,5 +1,4 @@
-package GUI;
-
+import GUI.MainAppController;
 import javafx.application.Application;
 import javafx.application.Platform;
 
@@ -17,6 +16,8 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 
@@ -41,12 +42,20 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initLayout();
+        primaryStage.show();
     }
 
     private void initLayout() {
         primaryStage.setTitle("Build Puller");
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("SM_Scanner.fxml"));
+        try {
+            URL loc = new URL(this.getClass().getResource("GUI/res/SM_Scanner.fxml").toExternalForm());
+            System.out.println(loc);
+            loader.setLocation(loc);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+//        loader.setLocation(getClass().getResource("GUI\\res\\SM_Scanner.fxml"));
         try {
             this.root = loader.load();
         } catch (IOException e) {
@@ -57,7 +66,7 @@ public class MainApp extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
-        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("res\\GetBuildsIcon.png")));
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
         primaryStage.setOnCloseRequest(we -> {
             primaryStage.hide();
@@ -79,7 +88,7 @@ public class MainApp extends Application {
             SystemTray tray = SystemTray.getSystemTray();
             java.awt.Image image = null;
             try {
-                image = ImageIO.read(this.getClass().getResourceAsStream("res\\GetBuildsIcon.png"));
+                image = ImageIO.read(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
