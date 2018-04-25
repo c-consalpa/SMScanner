@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
@@ -52,13 +51,13 @@ public class MNotification {
 
     public void show () throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(this.getClass().getResource("\\res\\notification.fxml"));
+        fxmlLoader.setLocation(this.getClass().getResource("/GUI/res/notification.fxml"));
         fxmlLoader.setController(this);
         AnchorPane root = fxmlLoader.load();
         nproductName.setText(productName);
         nproductVersion.setText(buildNumber);
 //        image doesn't load  bitch
-        Image quitImg = new Image("GUI/res/Close-Window-icon.png");
+        Image quitImg = new Image("/GUI/res/Close-Window-icon.png");
         imageView.setImage(quitImg);
         imageView.setOnMouseClicked(event ->
                 closeStageAnimated(notificationStage));
@@ -73,7 +72,7 @@ public class MNotification {
         final Scene scene = new Scene(root);
         scene.setFill(null);
         scene.getStylesheets().add(getClass().getResource(
-                "res\\notification.css").toExternalForm());
+                "/GUI/res/notification.css").toExternalForm());
 
         notificationStage.setScene(scene);
         positionNotificationStage(notificationStage);

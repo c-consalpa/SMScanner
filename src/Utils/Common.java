@@ -19,8 +19,6 @@ public class Common {
     public static final String propsFileTemplate = "Last downloaded %s build;";
 
 
-
-
     public static int getBuildNumberFromProps(File propertyFile, String propertyName) {
         int buildNumber = 0;
         Properties props = new Properties();

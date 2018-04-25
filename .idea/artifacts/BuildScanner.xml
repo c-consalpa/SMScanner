@@ -1,21 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" name="BuildScanner">
+  <artifact type="jar" name="BuildScanner">
     <output-path>$PROJECT_DIR$/out/artifacts/BuildScanner</output-path>
-    <properties id="javafx-properties">
-      <options>
-        <option name="appClass" value="MainApp" />
-        <option name="description" value="" />
-        <option name="htmlPlaceholderId" value="" />
-        <option name="title" value="" />
-        <option name="vendor" value="" />
-        <option name="version" value="" />
-      </options>
-    </properties>
-    <root id="root">
-      <element id="archive" name="BuildScanner.jar">
-        <element id="module-output" name="BuildScanner" />
-      </element>
-      <element id="library" level="project" name="lib" />
+    <root id="archive" name="BuildScanner.jar">
+      <element id="module-output" name="BuildScanner" />
     </root>
   </artifact>
 </component>
