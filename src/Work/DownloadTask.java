@@ -15,7 +15,7 @@ public class DownloadTask extends Task<String> {
     private MainAppController controller;
     private final String[] products;
     private final String version;
-    //This field is queries by mainApp to get what is currently downloading;
+    //This field is queried by mainApp to get what is currently downloading;
     private String currentlyDownloadedBuild;
 
     public DownloadTask(String[] products, String version, MainAppController controller) {

@@ -6,15 +6,12 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import Utils.Common;
+import org.apache.commons.io.FileUtils;
 
 import javax.rmi.CORBA.Util;
 
 import static Utils.Common.*;
 
-
-/**
- * Created by Konstantin on 14.01.2018.
- */
 public class FSUtils {
 
     public static void initHomeFolders(String[] products, String productVersion) {
@@ -47,23 +44,30 @@ public class FSUtils {
     }
 
     public static void cleanupFolders(String product, String version) {
-        File homeBuildsFolder = new File(Common.HOMEFS_BUILDS_FOLDER);
+        File homeBuildsFolder = new File(Common.HOMEFS_BUILDS_FOLDER + "\\" + version + "\\" + product);
         if (!homeBuildsFolder.exists()) return;
 
         File[] files2Clean = homeBuildsFolder.listFiles((dir, name) -> {
-            for (int i = 0; i < Common.FILE_EXTENSION.length; i++) {
-                if(name.endsWith(Common.FILE_EXTENSION[i])) {
-                    return true;
-                }
-            }
-            return false;
-        });
-        for (File f :
-                files2Clean) {
+          if (name.equals(Common.PROPERTY_FILE_NAME)) {
+              return false;
+          } else {
+              return true;
+          }});
+        for (File f : files2Clean) {
             if (!f.isDirectory()) {
                 f.delete();
+            } else {
+                try {
+                    FileUtils.deleteDirectory(f);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+
+
         }
+
     }
+
 
 }

@@ -2,8 +2,10 @@ package GUI;
 
 import Utils.Common;
 
+import Utils.FSUtils;
 import Work.DownloadService;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -21,13 +23,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class MainAppController {
     private DownloadService downloadService;
+    private boolean MainWindowisHidden = true;
 
     public DownloadService getDownloadService() {
         return downloadService;
@@ -88,7 +97,7 @@ public class MainAppController {
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
         String version = getVersion();
-        File destination = getDestination();
+        File destination = getDestination2DownloadFiles();
         int pollingInterval = getPollInterval();
         downloadService = new DownloadService(products, version, destination, this);
         downloadService.setPeriod(Duration.hours(pollingInterval));
@@ -186,7 +195,7 @@ public class MainAppController {
         return choice_poll.getValue();
     }
 
-    private File getDestination() {
+    private File getDestination2DownloadFiles() {
         String tmp = destinationDirectoryTextField.getText();
         File destination;
         if (tmp.isEmpty()) {
@@ -218,8 +227,8 @@ public class MainAppController {
     }
 
     public boolean taskIsActive() {
-        DownloadService activeService = getDownloadService();
-        if (activeService != null && activeService.getState().equals(Worker.State.RUNNING)) {
+        DownloadService runningService = getDownloadService();
+        if (runningService != null && runningService.getState().equals(Worker.State.RUNNING)) {
             return true;
         }
         return false;
@@ -232,4 +241,58 @@ public class MainAppController {
             return null;
         }
     }
+
+    public void addAppToTray(String currentlyDownloadingBuildName, Stage primaryStage) {
+        SystemTray tray = SystemTray.getSystemTray();
+        java.awt.Image image = null;
+        try {
+            image = ImageIO.read(this.getClass().getResourceAsStream("res/GetBuildsIcon.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        java.awt.MenuItem menuItemQuit = new java.awt.MenuItem("Quit");
+        menuItemQuit.addActionListener(e -> {
+            promptConfirmation(currentlyDownloadingBuildName);
+        });
+        java.awt.MenuItem menuItemRestore= new java.awt.MenuItem("Restore");
+        menuItemRestore.addActionListener(e -> {
+            if (MainWindowisHidden) Platform.runLater(() -> primaryStage.show());
+            tray.remove(tray.getTrayIcons()[0]);
+        });
+        PopupMenu pMenu = new PopupMenu();
+        pMenu.add(menuItemRestore);
+        pMenu.add(menuItemQuit);
+        TrayIcon trayIcon = new TrayIcon(image, "Currently downloading...", pMenu );
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+        String trayNotificationMessage = "Build is currently downloading";
+        if (currentlyDownloadingBuildName!=null) {
+            trayNotificationMessage += (": " + currentlyDownloadingBuildName);
+        }
+        trayIcon.displayMessage("Running in daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
+    }
+
+    private void promptConfirmation(String currentlyDownloadingBuildName) {
+        final String activeDownloadingBuildName = currentlyDownloadingBuildName;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Quit?");
+                alert.setHeaderText("Do you really want to quit?");
+                alert.setContentText("The following build is currently downloading: " + activeDownloadingBuildName);
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    terminateAndQuit();
+                } else {
+                    return;
+                }
+            }
+        });
+
+    }
+
 }
