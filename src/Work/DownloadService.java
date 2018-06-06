@@ -41,7 +41,7 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void failed() {
         super.failed();
-        System.out.println("SERVICE FAILED. REASON: "+getException());
+        System.out.println("SERVICE FAILED. REASON: " + getException());
     }
 
     @Override

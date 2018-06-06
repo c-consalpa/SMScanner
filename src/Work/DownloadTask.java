@@ -40,7 +40,6 @@ public class DownloadTask extends Task<String> {
     protected void failed() {
         super.failed();
         System.out.println("TASK FAILED");
-        System.out.println(Arrays.toString(getException().getStackTrace()));
         controller.consoleLog("***********");
     }
 
@@ -64,7 +63,7 @@ public class DownloadTask extends Task<String> {
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;
             currentlyDownloadedBuild = product;
-            DProduct dProduct = new DProduct(product, version);
+            DProduct dProduct = new DProduct(product, version, controller);
             int latestBuildNumber = dProduct.getRemoteBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
             if (currentBuildNumber == latestBuildNumber) {
@@ -74,6 +73,10 @@ public class DownloadTask extends Task<String> {
             } else {
                 FSUtils.cleanupFolders(product, version);
                 File remoteFile = dProduct.getDownloadFromURL(latestBuildNumber);
+                if (remoteFile == null) {
+//                    continue to next product if install file cannot be found
+                    continue;
+                }
                 String productFileName = remoteFile.getName();
                 File localFile = dProduct.getToURL(productFileName);
                 boolean downloadSuccessfull = downloadFiles(remoteFile, localFile);

@@ -1,6 +1,8 @@
 package Work;
 
+import GUI.MainAppController;
 import Utils.Common;
+import com.sun.javafx.collections.MappingChange;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,8 +20,10 @@ import static Utils.Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL;
 public class DProduct {
     private File productsRemoteFolder;
     private File productsHomeFolder;
+    private MainAppController controller;
+    private String productName;
 
-    public DProduct(String product, String version) {
+    public DProduct(String product, String version, MainAppController controller) {
         productsRemoteFolder = new File(Common.BASE_PATH +
                     Common.FS_DELIMITER +
                     version +
@@ -32,6 +36,8 @@ public class DProduct {
                 FS_DELIMITER +
                 product +
                 FS_DELIMITER);
+        this.controller = controller;
+        this.productName = product;
     }
 
     public int getRemoteBuildNumber() {
@@ -72,21 +78,29 @@ public class DProduct {
             System.out.println("Can't locate remote build folder.");
             return null;
         }
-        File from = pickSuitableFile(remoteFolder.listFiles());
+        File from = null;
+        try {
+            from = pickSuitableFile(remoteFolder);
+        } catch (FileNotFoundException e) {
+            controller.consoleLog(e.getMessage());
+            controller.consoleLog("Skipping product: " + productName);
+            return null;
+        }
         return from;
     }
 
-    private File pickSuitableFile(File[] folder) {
-//searches folder if there a file with ending with string from Common.EXTENSIONS
-        for (int i = 0; i < folder.length; i++) {
-            for (int j = 0; j < Common.FILE_EXTENSION.length; j++) {
-                if (folder[i].toString().endsWith(Common.FILE_EXTENSION[j])){
-                    System.out.println("File found: "+folder[i]);
-                    return new File(String.valueOf(folder[i]));
+    private File pickSuitableFile(File buildNumberFolder) throws FileNotFoundException {
+    //searches folder if there a file with ending with string from Common.EXTENSIONS
+        File[] artifactsInFolder = buildNumberFolder.listFiles();
+        for (int i = 0; i < Common.FILE_EXTENSIONS.length; i++) {
+            for (int j = 0; j < artifactsInFolder.length; j++) {
+                if (artifactsInFolder[j].getName().endsWith(Common.FILE_EXTENSIONS[i])) {
+                    System.out.println("File found: " + artifactsInFolder[j].getName());
+                    return artifactsInFolder[j];
                 }
             }
+            throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
         }
-        System.out.println("No matching files found");
         return null;
     }
 
