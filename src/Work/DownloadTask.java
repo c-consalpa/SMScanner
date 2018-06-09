@@ -129,7 +129,6 @@ public class DownloadTask extends Task<String> {
         return true;
     }
 
-
     private void printElapsedTime(long elapsed) {
         StringBuffer sb = new StringBuffer();
         sb.append("Elapsed time: ");

@@ -99,9 +99,9 @@ public class DProduct {
                     return artifactsInFolder[j];
                 }
             }
-            throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
+
         }
-        return null;
+        throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
     }
 
     public File getToURL(String productFileName) {
