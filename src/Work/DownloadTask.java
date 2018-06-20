@@ -97,6 +97,7 @@ public class DownloadTask extends Task<String> {
     }
 
     private boolean downloadFiles(File from, File to) {
+        //TODO rewrite this awful 165-year-old-slow-granddad-like downloader
         controller.consoleLog("INITIATING DOWNLOAD : " + from);
         if (!to.getParentFile().exists()) {
             to.mkdirs();

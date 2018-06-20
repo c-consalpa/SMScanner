@@ -50,9 +50,11 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
         controller = loader.getController();
-        primaryStage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        primaryStage.sizeToScene();
+        primaryStage.setHeight(425);
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
         preventClosingIfRunning(primaryStage);

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
@@ -8,13 +9,13 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainAppController">
+<AnchorPane fx:id="root" maxHeight="400.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainAppController">
    <children>
-      <VBox layoutX="219.0" layoutY="77.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="219.0" layoutY="77.0" maxWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane fx:id="controlsPane" prefHeight="225.0" prefWidth="200.0">
+            <AnchorPane fx:id="controlsPane" minHeight="-Infinity" prefHeight="225.0" prefWidth="200.0">
                <children>
-                  <VBox layoutX="20.0" layoutY="20.0" prefWidth="200.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+                  <VBox layoutX="20.0" layoutY="20.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
                      <children>
                         <GridPane fx:id="prod_checkBoxes" prefWidth="200.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
                            <children>
@@ -43,7 +44,7 @@
                         </GridPane>
                      </children>
                   </VBox>
-                  <VBox prefWidth="250.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                  <VBox prefWidth="250.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
                      <children>
                         <GridPane fx:id="rightGrid" layoutX="212.0" layoutY="14.0" vgap="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
                            <children>
@@ -87,7 +88,7 @@
                   <ProgressBar layoutX="250.0" layoutY="199.0" prefHeight="18.0" prefWidth="330.0" progress="0.0" visible="false" />
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="consolePane" prefHeight="175.0" prefWidth="200.0">
+            <AnchorPane fx:id="consolePane" minHeight="-Infinity" prefHeight="175.0" prefWidth="200.0">
                <children>
                   <Line endX="595.0" startX="5.0" stroke="#948c8c" />
                   <Label layoutX="5.0" layoutY="6.0" text="Console Ouput" AnchorPane.topAnchor="3.0" />
@@ -101,6 +102,22 @@
                   <TextArea fx:id="consoleTextArea" editable="false" layoutX="152.0" layoutY="-25.0" prefHeight="147.0" prefWidth="596.0" wrapText="true" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="25.0" />
                </children>
             </AnchorPane>
+            <GridPane fx:id="progressRegion" minHeight="-Infinity" prefHeight="35.0" visible="false">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.0" minWidth="10.0" prefWidth="80.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="576.0" minWidth="10.0" prefWidth="520.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <ProgressBar prefHeight="17.0" prefWidth="518.0" progress="0.0" GridPane.columnIndex="1" />
+                  <ProgressBar prefHeight="17.0" prefWidth="518.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Product" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Total" GridPane.rowIndex="1" />
+               </children>
+            </GridPane>
          </children>
       </VBox>
    </children>
