@@ -45,7 +45,6 @@ public class MainAppController {
     @FXML
     private AnchorPane root;
 
-
     @FXML
     private GridPane prod_checkBoxes;
 

@@ -7,7 +7,6 @@ import GUI.MainAppController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import java.io.*;
-import java.util.Arrays;
 import java.util.Date;
 
 
@@ -64,7 +63,7 @@ public class DownloadTask extends Task<String> {
             if (isCancelled()) continue;
             currentlyDownloadedBuild = product;
             DProduct dProduct = new DProduct(product, version, controller);
-            int latestBuildNumber = dProduct.getRemoteBuildNumber();
+            int latestBuildNumber = dProduct.getLatestBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
             if (currentBuildNumber == latestBuildNumber) {
                 controller.consoleLog("Current " + product + " " + version +
@@ -79,7 +78,8 @@ public class DownloadTask extends Task<String> {
                 }
                 String productFileName = remoteFile.getName();
                 File localFile = dProduct.getToURL(productFileName);
-                boolean downloadSuccessfull = downloadFiles(remoteFile, localFile);
+                boolean downloadSuccessfull = false;
+                downloadSuccessfull = downloadFiles(remoteFile, localFile);
                 if (downloadSuccessfull) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
                     Platform.runLater(() -> {
@@ -111,7 +111,6 @@ public class DownloadTask extends Task<String> {
             startTime = System.currentTimeMillis();
             while ((tmp = bfIn.read()) != -1) {
                 if (isCancelled()) {
-//                    bfOut.flush();
                     bfOut.close();
                     to.delete();
                     controller.consoleLog("Task cancelled. Removing file: " + to);

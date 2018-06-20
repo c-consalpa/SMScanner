@@ -40,7 +40,7 @@ public class DProduct {
         this.productName = product;
     }
 
-    public int getRemoteBuildNumber() {
+    public int getLatestBuildNumber() {
         int biggestnum = 0;
         if (productsRemoteFolder ==null) {
             System.out.println("Cannot get builds list;");
@@ -90,12 +90,14 @@ public class DProduct {
     }
 
     private File pickSuitableFile(File buildNumberFolder) throws FileNotFoundException {
-    //searches folder if there a file with ending with string from Common.EXTENSIONS
+    //scans remote folder if there a file one of Common.EXTENSIONS
         File[] artifactsInFolder = buildNumberFolder.listFiles();
         for (int i = 0; i < Common.FILE_EXTENSIONS.length; i++) {
             for (int j = 0; j < artifactsInFolder.length; j++) {
-                if (artifactsInFolder[j].getName().endsWith(Common.FILE_EXTENSIONS[i])) {
-                    System.out.println("File found: " + artifactsInFolder[j].getName());
+//                Search for file with name: ${ProductName} ...  .Common.EXTENSONS[i];
+//                eg.: "SpecBuilder_ASDASDASD123123123123.exe"
+                if(artifactsInFolder[j].getName().matches(productName + ".*\\." + Common.FILE_EXTENSIONS[i])) {
+                    System.out.println(artifactsInFolder[j].getName());
                     return artifactsInFolder[j];
                 }
             }
