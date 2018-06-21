@@ -97,7 +97,7 @@ public class DProduct {
 //                Search for file with name: ${ProductName} ...  .Common.EXTENSONS[i];
 //                eg.: "SpecBuilder_ASDASDASD123123123123.exe"
                 if(artifactsInFolder[j].getName().matches(productName + ".*\\." + Common.FILE_EXTENSIONS[i])) {
-                    System.out.println(artifactsInFolder[j].getName());
+
                     return artifactsInFolder[j];
                 }
             }

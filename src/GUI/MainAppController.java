@@ -6,6 +6,8 @@ import Utils.FSUtils;
 import Work.DownloadService;
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -27,6 +29,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -75,6 +78,12 @@ public class MainAppController {
     private Button startBtn;
 
     @FXML
+    public Text productProgressLabel;
+
+    @FXML
+    private ProgressBar totalProgressBar;
+
+    @FXML
     private void initialize() {
         setupVersionChoiceList();
         setupPollChoiceList();
@@ -98,22 +107,24 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-        showProgressBars();
+
 
 //        if (!validateUIFields()) return;
-//        disableUI(true);
-//
-//        String[] products = new String[getProducts().size()];
-//        System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
-//        String version = getVersion();
-//        File destination = getDestination2DownloadFiles();
-//        int pollingInterval = getPollInterval();
-//        downloadService = new DownloadService(products, version, destination, this);
+        disableUI(true);
+
+        String[] products = new String[getProducts().size()];
+        System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
+        String version = getVersion();
+        File destination = getDestination2DownloadFiles();
+        int pollingInterval = getPollInterval();
+        downloadService = new DownloadService(products, version, destination, this);
 //        downloadService.setPeriod(Duration.hours(pollingInterval));
-//        downloadService.start();
+        downloadService.setPeriod(Duration.seconds(15));
+
+        downloadService.start();
     }
 
-    private void showProgressBars() {
+    public void showProgressBars() {
         Scene scene = root.getScene();
         Stage stage = (Stage) scene.getWindow();
         double stageHeight = stage.heightProperty().doubleValue();
@@ -126,7 +137,7 @@ public class MainAppController {
         });
         Timeline resizer = new Timeline(
                 new KeyFrame(Duration.ZERO, new KeyValue(sceneHeight, stageHeight)),
-                new KeyFrame(Duration.millis(250), new KeyValue(sceneHeight, stageHeight + 35))
+                new KeyFrame(Duration.millis(250), new KeyValue(sceneHeight, stageHeight + 50 ))
         );
         resizer.setOnFinished(event -> {
             progressRegion.setVisible(true);
@@ -134,6 +145,18 @@ public class MainAppController {
         resizer.setCycleCount(1);
         resizer.setAutoReverse(true);
         resizer.play();
+    }
+
+    public void hideProgress() {
+        totalProgressBar.progressProperty().unbind();
+        Scene scene = root.getScene();
+        Stage stage = (Stage) scene.getWindow();
+        stage.setHeight(430);
+    }
+
+
+    public void bindProgressProp(ReadOnlyDoubleProperty d) {
+        totalProgressBar.progressProperty().bind(d);
     }
 
     @FXML
@@ -326,5 +349,11 @@ public class MainAppController {
         });
 
     }
+
+    public void unbindProgress(int length) {
+        totalProgressBar.progressProperty().unbind();
+        totalProgressBar.setProgress(length);
+    }
+
 
 }

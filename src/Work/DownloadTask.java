@@ -7,6 +7,7 @@ import GUI.MainAppController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 
 
@@ -27,6 +28,9 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
+//        controller.hideProgress();
+//        controller.unbindProgress(products.length);
+
     }
 
     @Override
@@ -57,8 +61,12 @@ public class DownloadTask extends Task<String> {
             controller.consoleLog("Cannot access the server. Terminating cycle.");
             return;
         }
+        controller.showProgressBars();
+        for (int i = 0; i < products.length; i++) {
+            String product = products[i];
+            controller.productProgressLabel.setText(product);
+            updateProgress(i, products.length);
 
-        for (String product : products) {
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;
             currentlyDownloadedBuild = product;
@@ -79,7 +87,7 @@ public class DownloadTask extends Task<String> {
                 String productFileName = remoteFile.getName();
                 File localFile = dProduct.getToURL(productFileName);
                 boolean downloadSuccessfull = false;
-                downloadSuccessfull = downloadFiles(remoteFile, localFile);
+//                downloadSuccessfull = downloadFiles(remoteFile, localFile);
                 if (downloadSuccessfull) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
                     Platform.runLater(() -> {
@@ -93,6 +101,7 @@ public class DownloadTask extends Task<String> {
                     });
                 }
             }
+
         }
     }
 

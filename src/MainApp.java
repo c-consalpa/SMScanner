@@ -37,6 +37,7 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
         initLayout();
         primaryStage.show();
+        primaryStage.setHeight(430);
     }
 
     private void initLayout() {
@@ -54,7 +55,7 @@ public class MainApp extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        primaryStage.setHeight(425);
+
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
         preventClosingIfRunning(primaryStage);

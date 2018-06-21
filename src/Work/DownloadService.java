@@ -19,13 +19,14 @@ public class DownloadService extends ScheduledService<String> {
         this.products = products;
         this.version = version;
         this.destination = destination;
-
         controller = mainAppController;
     }
 
     @Override
     protected Task createTask() {
         currentTask = new DownloadTask(products, version, controller);
+        System.out.println("created task");
+        controller.bindProgressProp(currentTask.progressProperty());
         return currentTask;
     }
 
