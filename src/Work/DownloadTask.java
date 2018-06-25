@@ -7,6 +7,7 @@ import GUI.MainAppController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 
 
@@ -27,17 +28,29 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
+        System.out.println("task succ");
+        controller.setMaxAndWait(products.length);
+    }
+
+    @Override
+    protected void running() {
+        super.running();
+        controller.setOverallProgress(0);
+
     }
 
     @Override
     protected void cancelled() {
         super.cancelled();
         System.out.println("TASK CANCELLED");
+
     }
 
     @Override
     protected void failed() {
         super.failed();
+        Exception e = (Exception) getException();
+        System.out.println(e.toString());
         System.out.println("TASK FAILED");
         controller.consoleLog("***********");
     }
@@ -51,25 +64,28 @@ public class DownloadTask extends Task<String> {
 
     private void makeCycle() {
 
-        try {
-            checkConnection();
-        } catch (IOException e) {
-            controller.consoleLog("Cannot access the server. Terminating cycle.");
-            return;
-        }
+//        try {
+//            checkConnection();
+//        } catch (IOException e) {
+//            controller.consoleLog("Cannot access the server. Terminating cycle.");
+//            return;
+//        }
 
-        for (String product : products) {
+        for (int i = 0; i < products.length; i++) {
+
+
+            String product = products[i];
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;
             currentlyDownloadedBuild = product;
             DProduct dProduct = new DProduct(product, version, controller);
             int latestBuildNumber = dProduct.getLatestBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
-            if (currentBuildNumber == latestBuildNumber) {
-                controller.consoleLog("Current " + product + " " + version +
-                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
-                continue;
-            } else {
+//            if (currentBuildNumber == latestBuildNumber) {
+//                controller.consoleLog("Current " + product + " " + version +
+//                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
+//                continue;
+//            } else {
                 FSUtils.cleanupFolders(product, version);
                 File remoteFile = dProduct.getDownloadFromURL(latestBuildNumber);
                 if (remoteFile == null) {
@@ -92,7 +108,12 @@ public class DownloadTask extends Task<String> {
                         }
                     });
                 }
+//            }
+
+            if (i==0) {
+                controller.bindOverallProgress(this);
             }
+            updateProgress(i+1, products.length );
         }
     }
 
