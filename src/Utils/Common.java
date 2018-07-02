@@ -12,7 +12,7 @@ public class Common {
 
     public static final String PROPERTY_FILE_NAME = "latest.properties";
 //    public static final String BASE_PATH = "\\\\enbuild06\\Builds";
-    public static final String BASE_PATH = "D:\\SMTest\\Builds";
+    public static final String BASE_PATH = "D:\\emulated\\Builds";
     public static final String FS_DELIMITER = "\\";
     //    Properties that carry latest version info on local fs/net
     public static final String PROPERTY_BUILD_NUMBER_KEY_LOCAL = "b_version";

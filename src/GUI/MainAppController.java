@@ -79,6 +79,9 @@ public class MainAppController {
     @FXML
     private ProgressBar overallProgressBar;
 
+    @FXML ProgressBar singleProductProgresssBar;
+
+
     @FXML
     private void initialize() {
         setupVersionChoiceList();
@@ -100,6 +103,7 @@ public class MainAppController {
 
     @FXML
     private GridPane progressRegion;
+
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
@@ -335,12 +339,11 @@ public class MainAppController {
 
     public void bindOverallProgress(DownloadTask task) {
         Platform.runLater(() -> {
-            System.out.println("BIND");
             overallProgressBar.progressProperty().bind(task.progressProperty());
         });
     }
 
-    public void setMaxAndWait(int max) {
+    public void setMaxProgressAndWait(int max) {
         Platform.runLater(() -> {
             System.out.println("UNBIND");
             overallProgressBar.progressProperty().unbind();
@@ -350,5 +353,12 @@ public class MainAppController {
 
     public void setOverallProgress(int i) {
         overallProgressBar.setProgress(0);
+    }
+
+    public void updateSingleProductProgress(double step) {
+        Platform.runLater(() -> {
+            singleProductProgresssBar.setProgress(step);
+        });
+
     }
 }

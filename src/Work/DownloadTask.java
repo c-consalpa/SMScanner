@@ -7,7 +7,6 @@ import GUI.MainAppController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import java.io.*;
-import java.util.Arrays;
 import java.util.Date;
 
 
@@ -28,15 +27,14 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        System.out.println("task succ");
-        controller.setMaxAndWait(products.length);
+        System.out.println("TASK SUCCESS");
+        controller.setMaxProgressAndWait(products.length);
     }
 
     @Override
     protected void running() {
         super.running();
         controller.setOverallProgress(0);
-
     }
 
     @Override
@@ -72,8 +70,6 @@ public class DownloadTask extends Task<String> {
 //        }
 
         for (int i = 0; i < products.length; i++) {
-
-
             String product = products[i];
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;
@@ -125,6 +121,15 @@ public class DownloadTask extends Task<String> {
         }
         long startTime = 0;
         long endTime = 0;
+
+        long fileLength = from.length();
+        int SCALE_MAX = 20;
+        long downloadProgressScale_1 = fileLength / SCALE_MAX;
+        long currentByte = 0;
+        long downloadProgressPosition = downloadProgressScale_1;
+        double step = 0;
+
+
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
                 BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
@@ -132,11 +137,19 @@ public class DownloadTask extends Task<String> {
             int tmp;
             startTime = System.currentTimeMillis();
             while ((tmp = bfIn.read()) != -1) {
+                currentByte++;
                 if (isCancelled()) {
                     bfOut.close();
                     to.delete();
                     controller.consoleLog("Task cancelled. Removing file: " + to);
                     return false;
+                }
+                if(currentByte >= downloadProgressPosition) {
+                    step = (step + 1 * (100/SCALE_MAX)) * 0.01;
+                    System.out.println("part:" + step + "% : " + "["+currentByte+"]");
+                    downloadProgressPosition+=downloadProgressScale_1;
+
+//                    controller.updateSingleProductProgress(step);
                 }
                 bfOut.write(tmp);
             }
