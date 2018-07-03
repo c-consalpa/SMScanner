@@ -122,13 +122,13 @@ public class DownloadTask extends Task<String> {
         long startTime = 0;
         long endTime = 0;
 
-        long fileLength = from.length();
-        int SCALE_MAX = 20;
-        long downloadProgressScale_1 = fileLength / SCALE_MAX;
+//        fields used to update the progress of download process:
+        final long FILE_SIZE = from.length();
+        final double PROGRESS_PRECISION = 100;
+        final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
+        double threshold = progressGraduationUnit;
         long currentByte = 0;
-        long downloadProgressPosition = downloadProgressScale_1;
-        double step = 0;
-
+        double progressUpdateFireCount = 2; // 2 because
 
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
@@ -144,12 +144,12 @@ public class DownloadTask extends Task<String> {
                     controller.consoleLog("Task cancelled. Removing file: " + to);
                     return false;
                 }
-                if(currentByte >= downloadProgressPosition) {
-                    step = (step + 1 * (100/SCALE_MAX)) * 0.01;
-                    System.out.println("part:" + step + "% : " + "["+currentByte+"]");
-                    downloadProgressPosition+=downloadProgressScale_1;
+//                check if another 1/PRECISION of file is downloaded:
+                if(currentByte >= threshold) {
+                    System.out.println(progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
+                    controller.updateSingleProductProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
 
-//                    controller.updateSingleProductProgress(step);
+                    threshold += progressGraduationUnit;
                 }
                 bfOut.write(tmp);
             }
