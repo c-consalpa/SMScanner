@@ -27,17 +27,28 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
+        System.out.println("TASK SUCCESS");
+        controller.setMaxProgressAndWait(products.length);
+    }
+
+    @Override
+    protected void running() {
+        super.running();
+        controller.setOverallProgress(0);
     }
 
     @Override
     protected void cancelled() {
         super.cancelled();
         System.out.println("TASK CANCELLED");
+
     }
 
     @Override
     protected void failed() {
         super.failed();
+        Exception e = (Exception) getException();
+        System.out.println(e.toString());
         System.out.println("TASK FAILED");
         controller.consoleLog("***********");
     }
@@ -51,25 +62,26 @@ public class DownloadTask extends Task<String> {
 
     private void makeCycle() {
 
-        try {
-            checkConnection();
-        } catch (IOException e) {
-            controller.consoleLog("Cannot access the server. Terminating cycle.");
-            return;
-        }
+//        try {
+//            checkConnection();
+//        } catch (IOException e) {
+//            controller.consoleLog("Cannot access the server. Terminating cycle.");
+//            return;
+//        }
 
-        for (String product : products) {
+        for (int i = 0; i < products.length; i++) {
+            String product = products[i];
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;
             currentlyDownloadedBuild = product;
             DProduct dProduct = new DProduct(product, version, controller);
             int latestBuildNumber = dProduct.getLatestBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
-            if (currentBuildNumber == latestBuildNumber) {
-                controller.consoleLog("Current " + product + " " + version +
-                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
-                continue;
-            } else {
+//            if (currentBuildNumber == latestBuildNumber) {
+//                controller.consoleLog("Current " + product + " " + version +
+//                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
+//                continue;
+//            } else {
                 FSUtils.cleanupFolders(product, version);
                 File remoteFile = dProduct.getDownloadFromURL(latestBuildNumber);
                 if (remoteFile == null) {
@@ -92,7 +104,12 @@ public class DownloadTask extends Task<String> {
                         }
                     });
                 }
+//            }
+
+            if (i==0) {
+                controller.bindOverallProgress(this);
             }
+            updateProgress(i+1, products.length );
         }
     }
 
@@ -104,6 +121,15 @@ public class DownloadTask extends Task<String> {
         }
         long startTime = 0;
         long endTime = 0;
+
+//        fields used to update the progress of download process:
+        final long FILE_SIZE = from.length();
+        final double PROGRESS_PRECISION = 100;
+        final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
+        double threshold = progressGraduationUnit;
+        long currentByte = 0;
+        double progressUpdateFireCount = 2; // 2 because
+
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
                 BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
@@ -111,11 +137,19 @@ public class DownloadTask extends Task<String> {
             int tmp;
             startTime = System.currentTimeMillis();
             while ((tmp = bfIn.read()) != -1) {
+                currentByte++;
                 if (isCancelled()) {
                     bfOut.close();
                     to.delete();
                     controller.consoleLog("Task cancelled. Removing file: " + to);
                     return false;
+                }
+//                check if another 1/PRECISION of file is downloaded:
+                if(currentByte >= threshold) {
+                    System.out.println(progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
+                    controller.updateSingleProductProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
+
+                    threshold += progressGraduationUnit;
                 }
                 bfOut.write(tmp);
             }

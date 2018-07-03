@@ -4,8 +4,10 @@ import Utils.Common;
 
 import Utils.FSUtils;
 import Work.DownloadService;
+import Work.DownloadTask;
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -75,6 +77,12 @@ public class MainAppController {
     private Button startBtn;
 
     @FXML
+    private ProgressBar overallProgressBar;
+
+    @FXML ProgressBar singleProductProgresssBar;
+
+
+    @FXML
     private void initialize() {
         setupVersionChoiceList();
         setupPollChoiceList();
@@ -96,6 +104,7 @@ public class MainAppController {
     @FXML
     private GridPane progressRegion;
 
+
     @FXML
     private void onStartBtn(ActionEvent ev) {
         showProgressBars();
@@ -103,14 +112,15 @@ public class MainAppController {
 //        if (!validateUIFields()) return;
 //        disableUI(true);
 //
-//        String[] products = new String[getProducts().size()];
-//        System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
-//        String version = getVersion();
-//        File destination = getDestination2DownloadFiles();
-//        int pollingInterval = getPollInterval();
-//        downloadService = new DownloadService(products, version, destination, this);
+        String[] products = new String[getProducts().size()];
+        System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
+        String version = getVersion();
+        File destination = getDestination2DownloadFiles();
+        int pollingInterval = getPollInterval();
+        downloadService = new DownloadService(products, version, destination, this);
 //        downloadService.setPeriod(Duration.hours(pollingInterval));
-//        downloadService.start();
+        downloadService.setPeriod(Duration.seconds(20));
+        downloadService.start();
     }
 
     private void showProgressBars() {
@@ -327,4 +337,28 @@ public class MainAppController {
 
     }
 
+    public void bindOverallProgress(DownloadTask task) {
+        Platform.runLater(() -> {
+            overallProgressBar.progressProperty().bind(task.progressProperty());
+        });
+    }
+
+    public void setMaxProgressAndWait(int max) {
+        Platform.runLater(() -> {
+            System.out.println("UNBIND");
+            overallProgressBar.progressProperty().unbind();
+            overallProgressBar.setProgress(max);
+        });
+    }
+
+    public void setOverallProgress(int i) {
+        overallProgressBar.setProgress(0);
+    }
+
+    public void updateSingleProductProgress(double step) {
+        Platform.runLater(() -> {
+            singleProductProgresssBar.setProgress(step);
+        });
+
+    }
 }

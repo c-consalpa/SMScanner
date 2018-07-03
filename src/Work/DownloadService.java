@@ -26,6 +26,8 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected Task createTask() {
         currentTask = new DownloadTask(products, version, controller);
+
+
         return currentTask;
     }
 

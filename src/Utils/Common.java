@@ -8,11 +8,10 @@ import java.util.Properties;
 
 public class Common {
     public static String HOMEFS_BUILDS_FOLDER = "D:\\\\Builds";
-    public static final String[] FILE_EXTENSIONS = {"zip", "msi", "exe"};
-
+    public static final String[] FILE_EXTENSIONS = {"pdf", "zip", "msi", "exe"};
     public static final String PROPERTY_FILE_NAME = "latest.properties";
     public static final String BASE_PATH = "\\\\enbuild06\\Builds";
-//    public static final String BASE_PATH = "D:\\emulated";
+//    public static final String BASE_PATH = "D:\\SMTest\\Builds";
     public static final String FS_DELIMITER = "\\";
     //    Properties that carry latest version info on local fs/net
     public static final String PROPERTY_BUILD_NUMBER_KEY_LOCAL = "b_version";
