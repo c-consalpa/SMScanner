@@ -128,7 +128,7 @@ public class DownloadTask extends Task<String> {
         final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
         double threshold = progressGraduationUnit;
         long currentByte = 0;
-        double progressUpdateFireCount = 2; // 2 because
+        double progressUpdateFireCount = 1; // 2 because
 
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
@@ -146,9 +146,7 @@ public class DownloadTask extends Task<String> {
                 }
 //                check if another 1/PRECISION of file is downloaded:
                 if(currentByte >= threshold) {
-                    System.out.println(progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
                     controller.updateSingleProductProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
-
                     threshold += progressGraduationUnit;
                 }
                 bfOut.write(tmp);
