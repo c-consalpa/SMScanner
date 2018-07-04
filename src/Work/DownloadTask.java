@@ -21,6 +21,7 @@ public class DownloadTask extends Task<String> {
         this.products = products;
         this.version = version;
         this.controller = controller;
+
         Utils.FSUtils.initHomeFolders(products, version);
     }
 
@@ -61,13 +62,12 @@ public class DownloadTask extends Task<String> {
     }
 
     private void makeCycle() {
-
-//        try {
-//            checkConnection();
-//        } catch (IOException e) {
-//            controller.consoleLog("Cannot access the server. Terminating cycle.");
-//            return;
-//        }
+        try {
+            checkConnection();
+        } catch (IOException e) {
+            controller.consoleLog("The server is unavailable. Terminating cycle.");
+            return;
+        }
 
         for (int i = 0; i < products.length; i++) {
             String product = products[i];
@@ -119,24 +119,24 @@ public class DownloadTask extends Task<String> {
         if (!to.getParentFile().exists()) {
             to.mkdirs();
         }
+        // vars to calulate time elapsed per 1 download
         long startTime = 0;
         long endTime = 0;
 
-//        fields used to update the progress of download process:
+        //      fields used to update the progress of download process:
         final long FILE_SIZE = from.length();
         final double PROGRESS_PRECISION = 100;
         final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
         double threshold = progressGraduationUnit;
         long currentByte = 0;
         double progressUpdateFireCount = 1; // 2 because
-
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
                 BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
         ) {
-            int tmp;
+            int tmpByte;
             startTime = System.currentTimeMillis();
-            while ((tmp = bfIn.read()) != -1) {
+            while ((tmpByte = bfIn.read()) != -1) {
                 currentByte++;
                 if (isCancelled()) {
                     bfOut.close();
@@ -144,32 +144,32 @@ public class DownloadTask extends Task<String> {
                     controller.consoleLog("Task cancelled. Removing file: " + to);
                     return false;
                 }
-//                check if another 1/PRECISION of file is downloaded:
+        //  check if another 1/PRECISION portion of file is downloaded:
                 if(currentByte >= threshold) {
                     controller.updateSingleProductProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
                     threshold += progressGraduationUnit;
                 }
-                bfOut.write(tmp);
+                bfOut.write(tmpByte);
             }
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
         endTime = System.currentTimeMillis();
-        controller.consoleLog("Downloaded file: " + to);
-        printElapsedTime(endTime - startTime);
+        controller.consoleLog("FILE DOWNLOADED: " + to);
+        controller.consoleLog(getElapsedTime(endTime - startTime));
+
         return true;
     }
 
-    private void printElapsedTime(long elapsed) {
+    private String getElapsedTime(long elapsed) {
         StringBuffer sb = new StringBuffer();
         sb.append("Elapsed time: ");
         if (elapsed/1000/60/60 >= 1) sb.append((int) elapsed/1000/60/60 + " hours ");
         if (elapsed/1000/60 >= 1) sb.append((int) elapsed/1000/60 + " minutes ");
         if (elapsed/1000 >= 1) sb.append((int) elapsed/1000%60 + " seconds ");
 
-        controller.consoleLog(sb.toString());
-
+        return (sb.toString());
     }
 
     private void checkConnection() throws IOException {

@@ -79,8 +79,8 @@ public class MainAppController {
     @FXML
     private ProgressBar overallProgressBar;
 
-    @FXML ProgressBar singleProductProgresssBar;
-
+    @FXML
+    private ProgressBar singleProductProgresssBar;
 
     @FXML
     private void initialize() {
