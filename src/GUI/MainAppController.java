@@ -316,31 +316,32 @@ public class MainAppController {
         });
     }
 
-    public void setMaxProgressAndWait(int max) {
-        Platform.runLater(() -> {
-            System.out.println("UNBIND");
-            overallProgressBar.progressProperty().unbind();
-            overallProgressBar.setProgress(max);
-        });
-    }
 
     public void setOverallProgress(int i) {
-        overallProgressBar.setProgress(0);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                overallProgressBar.setProgress(i);
+            }
+        });
+
     }
 
     public void updateSingleProductProgress(double step) {
         Platform.runLater(() -> {
             singleProductProgresssBar.setProgress(step);
         });
-
     }
 
-    private void nullifyProgress() {
+    public void nullifyProgress() {
+        Platform.runLater(() -> {
         singleProductProgresssBar.setProgress(0d);
         if (overallProgressBar.progressProperty().isBound()) {
             overallProgressBar.progressProperty().unbind();
         }
         overallProgressBar.setProgress(0d);
+        downloadingProductLabel.setText("Product");
+        });
     }
 
     public void updateDownloadedProductName(String product) {

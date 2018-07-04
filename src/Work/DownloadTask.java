@@ -29,7 +29,7 @@ public class DownloadTask extends Task<String> {
     protected void succeeded() {
         super.succeeded();
         System.out.println("TASK SUCCESS");
-        controller.setMaxProgressAndWait(products.length);
+        controller.nullifyProgress();
     }
 
     @Override
@@ -106,10 +106,9 @@ public class DownloadTask extends Task<String> {
                 }
 //            }
 
-            if (i==0) {
-                controller.bindOverallProgress(this);
+            if (!isCancelled()) {
+                controller.setOverallProgress(i);
             }
-            updateProgress(i+1, products.length );
         }
     }
 
