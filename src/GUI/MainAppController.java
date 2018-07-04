@@ -1,16 +1,10 @@
 package GUI;
 
 import Utils.Common;
-
-import Utils.FSUtils;
 import Work.DownloadService;
 import Work.DownloadTask;
 import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -29,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -77,7 +72,13 @@ public class MainAppController {
     private Button startBtn;
 
     @FXML
+    private GridPane progressRegion;
+
+    @FXML
     private ProgressBar overallProgressBar;
+
+    @FXML
+    private Text downloadingProductLabel;
 
     @FXML
     private ProgressBar singleProductProgresssBar;
@@ -97,53 +98,25 @@ public class MainAppController {
     private void onStop(ActionEvent ev) {
         if (downloadService != null) {
             downloadService.cancel();
+            nullifyProgress();
         }
         disableUI(false);
     }
 
     @FXML
-    private GridPane progressRegion;
-
-
-    @FXML
     private void onStartBtn(ActionEvent ev) {
-        showProgressBars();
-
 //        if (!validateUIFields()) return;
 //        disableUI(true);
-//
+
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
         String version = getVersion();
         File destination = getDestination2DownloadFiles();
         int pollingInterval = getPollInterval();
         downloadService = new DownloadService(products, version, destination, this);
-//        downloadService.setPeriod(Duration.hours(pollingInterval));
-        downloadService.setPeriod(Duration.seconds(20));
+        downloadService.setPeriod(Duration.hours(pollingInterval));
+//        downloadService.setPeriod(Duration.seconds(20));
         downloadService.start();
-    }
-
-    private void showProgressBars() {
-        Scene scene = root.getScene();
-        Stage stage = (Stage) scene.getWindow();
-        double stageHeight = stage.heightProperty().doubleValue();
-        SimpleDoubleProperty sceneHeight = new SimpleDoubleProperty();
-        sceneHeight.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                stage.setHeight(newValue.doubleValue());
-            }
-        });
-        Timeline resizer = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(sceneHeight, stageHeight)),
-                new KeyFrame(Duration.millis(250), new KeyValue(sceneHeight, stageHeight + 35))
-        );
-        resizer.setOnFinished(event -> {
-            progressRegion.setVisible(true);
-        });
-        resizer.setCycleCount(1);
-        resizer.setAutoReverse(true);
-        resizer.play();
     }
 
     @FXML
@@ -360,5 +333,27 @@ public class MainAppController {
             singleProductProgresssBar.setProgress(step);
         });
 
+    }
+
+    private void nullifyProgress() {
+        singleProductProgresssBar.setProgress(0d);
+        if (overallProgressBar.progressProperty().isBound()) {
+            overallProgressBar.progressProperty().unbind();
+        }
+        overallProgressBar.setProgress(0d);
+    }
+
+    public void updateDownloadedProductName(String product) {
+        final int Ellipsis_threshold = 10;
+
+        Platform.runLater(() -> {
+            String productName = product;
+            if (product.length() > Ellipsis_threshold) {
+                productName = product.substring(0, Ellipsis_threshold);
+                productName += "...";
+            }
+            downloadingProductLabel.setText(productName);
+
+        });
     }
 }

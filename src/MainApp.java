@@ -54,7 +54,8 @@ public class MainApp extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        primaryStage.setHeight(425);
+        primaryStage.sizeToScene();
+//        primaryStage.setHeight(392);
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
         preventClosingIfRunning(primaryStage);

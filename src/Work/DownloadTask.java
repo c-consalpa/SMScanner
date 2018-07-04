@@ -42,7 +42,6 @@ public class DownloadTask extends Task<String> {
     protected void cancelled() {
         super.cancelled();
         System.out.println("TASK CANCELLED");
-
     }
 
     @Override
@@ -91,6 +90,7 @@ public class DownloadTask extends Task<String> {
                 String productFileName = remoteFile.getName();
                 File localFile = dProduct.getToURL(productFileName);
                 boolean downloadSuccessfull = false;
+                controller.updateDownloadedProductName(product);
                 downloadSuccessfull = downloadFiles(remoteFile, localFile);
                 if (downloadSuccessfull) {
                     dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
@@ -116,6 +116,7 @@ public class DownloadTask extends Task<String> {
     private boolean downloadFiles(File from, File to) {
         //TODO rewrite this awful 165-year-old-slow-granddad-like downloader
         controller.consoleLog("INITIATING DOWNLOAD : " + from);
+        controller.updateSingleProductProgress(0d);
         if (!to.getParentFile().exists()) {
             to.mkdirs();
         }

@@ -28,7 +28,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="root" maxHeight="400.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainAppController">
+<AnchorPane fx:id="root" minWidth="-Infinity" prefWidth="600.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainAppController">
    <children>
       <VBox layoutX="219.0" layoutY="77.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -106,7 +106,7 @@
                   </VBox>
                </children>
             </AnchorPane>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox>
                <children>
                   <Separator prefHeight="3.0">
                      <opaqueInsets>
@@ -121,8 +121,8 @@
                   </Separator>
                   <AnchorPane>
                      <children>
-                        <Label text="Console Ouput" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="2.0" />
-                        <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clearConsole" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="2.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="2.0">
+                        <Label text="Console Ouput" AnchorPane.leftAnchor="5.0" />
+                        <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clearConsole" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="2.0" AnchorPane.rightAnchor="5.0">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -132,13 +132,44 @@
                         </ImageView>
                      </children>
                   </AnchorPane>
-                  <TextArea fx:id="consoleTextArea" editable="false" wrapText="true">
+                  <TextArea fx:id="consoleTextArea" editable="false" prefHeight="150.0" wrapText="true">
                      <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" />
                      </VBox.margin>
                   </TextArea>
                </children>
             </VBox>
+            <GridPane fx:id="progressRegion" prefHeight="40.0" vgap="3.0">
+               <children>
+                  <ProgressBar fx:id="singleProductProgresssBar" progress="0.0" styleClass="progressBar" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                  <ProgressBar fx:id="overallProgressBar" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets />
+                     </GridPane.margin>
+                  </ProgressBar>
+                  <Text fx:id="downloadingProductLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Product">
+                     <GridPane.margin>
+                        <Insets left="5.0" />
+                     </GridPane.margin>
+                  </Text>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Total" GridPane.rowIndex="1">
+                     <GridPane.margin>
+                        <Insets left="5.0" />
+                     </GridPane.margin>
+                  </Text>
+               </children>
+               <columnConstraints>
+                  <ColumnConstraints maxWidth="-Infinity" prefWidth="75.0" />
+                  <ColumnConstraints fillWidth="false" halignment="RIGHT" hgrow="ALWAYS" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
+               </VBox.margin>
+            </GridPane>
          </children>
       </VBox>
    </children>

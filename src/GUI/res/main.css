@@ -24,3 +24,7 @@
 	/*-fx-min-height: 20;*/
 	-fx-pref-height: 25;
 }
+
+#progressRegion .progress-bar {
+	-fx-pref-width: 500;
+}
