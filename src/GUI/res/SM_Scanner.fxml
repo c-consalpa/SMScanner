@@ -30,13 +30,13 @@
 
 <AnchorPane fx:id="root" maxHeight="400.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@main.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.MainAppController">
    <children>
-      <VBox layoutX="219.0" layoutY="77.0" maxWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox layoutX="219.0" layoutY="77.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane fx:id="controlsPane" minHeight="-Infinity" prefHeight="225.0" prefWidth="200.0">
+            <AnchorPane fx:id="controlsPane">
                <children>
-                  <VBox layoutX="20.0" layoutY="20.0" prefWidth="200.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
+                  <VBox layoutX="20.0" layoutY="20.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
                      <children>
-                        <GridPane fx:id="prod_checkBoxes" prefWidth="200.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+                        <GridPane fx:id="prod_checkBoxes" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
                            <children>
                               <Label text="Products" />
                               <CheckBox fx:id="prod_EAM" mnemonicParsing="false" text="EAM" GridPane.rowIndex="1" />
@@ -48,7 +48,7 @@
                               <CheckBox fx:id="prod_VisualizerServer" mnemonicParsing="false" text="Visualizer Server" GridPane.rowIndex="4" />
                            </children>
                            <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                            </columnConstraints>
                            <rowConstraints>
                               <RowConstraints vgrow="SOMETIMES" />
@@ -63,7 +63,7 @@
                         </GridPane>
                      </children>
                   </VBox>
-                  <VBox prefHeight="189.0" prefWidth="335.0" AnchorPane.bottomAnchor="21.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+                  <VBox AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
                      <children>
                         <GridPane fx:id="rightGrid" layoutX="212.0" layoutY="14.0" vgap="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
                            <children>
@@ -83,9 +83,9 @@
                               <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                            </rowConstraints>
                         </GridPane>
-                        <HBox fx:id="pathBar" minWidth="25.0" prefHeight="0.0" prefWidth="330.0">
+                        <HBox fx:id="pathBar" minWidth="25.0">
                            <children>
-                              <TextField fx:id="destinationDirectoryTextField" prefHeight="25.0" prefWidth="292.0">
+                              <TextField fx:id="destinationDirectoryTextField" prefHeight="25.0" prefWidth="292.0" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
@@ -104,23 +104,41 @@
                         </HBox>
                      </children>
                   </VBox>
-                  <ProgressBar layoutX="250.0" layoutY="199.0" prefHeight="18.0" prefWidth="330.0" progress="0.0" visible="false" />
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="consolePane" minHeight="-Infinity" prefHeight="175.0" prefWidth="200.0">
+            <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Line endX="595.0" startX="5.0" stroke="#948c8c" />
-                  <Label layoutX="5.0" layoutY="6.0" text="Console Ouput" AnchorPane.topAnchor="3.0" />
-                  <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="468.0" layoutY="-69.0" onMouseClicked="#clearConsole" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="3.0">
-                     <image>
-                        <Image url="@clearConsole.png" />
-                     </image>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor></ImageView>
-                  <TextArea fx:id="consoleTextArea" editable="false" layoutX="152.0" layoutY="-25.0" prefHeight="147.0" prefWidth="596.0" wrapText="true" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="25.0" />
+                  <Separator prefHeight="3.0">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                     <padding>
+                        <Insets left="5.0" right="5.0" />
+                     </padding>
+                  </Separator>
+                  <AnchorPane>
+                     <children>
+                        <Label text="Console Ouput" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="2.0" />
+                        <ImageView fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clearConsole" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="2.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="2.0">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <image>
+                              <Image url="@clearConsole.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+                  <TextArea fx:id="consoleTextArea" editable="false" wrapText="true">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </VBox.margin>
+                  </TextArea>
                </children>
-            </AnchorPane>
+            </VBox>
          </children>
       </VBox>
    </children>
