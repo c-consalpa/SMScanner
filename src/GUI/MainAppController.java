@@ -2,18 +2,15 @@ package GUI;
 
 import Utils.Common;
 import Work.DownloadService;
-import Work.DownloadTask;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -75,7 +72,7 @@ public class MainAppController {
     private GridPane progressRegion;
 
     @FXML
-    private ProgressBar overallProgressBar;
+    private ProgressBar totalProgressBar;
 
     @FXML
     private Text downloadingProductLabel;
@@ -105,8 +102,8 @@ public class MainAppController {
 
     @FXML
     private void onStartBtn(ActionEvent ev) {
-//        if (!validateUIFields()) return;
-//        disableUI(true);
+        if (!validateUIFields()) return;
+        disableUI(true);
 
         String[] products = new String[getProducts().size()];
         System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
@@ -310,21 +307,9 @@ public class MainAppController {
 
     }
 
-    public void bindOverallProgress(DownloadTask task) {
-        Platform.runLater(() -> {
-            overallProgressBar.progressProperty().bind(task.progressProperty());
-        });
-    }
-
-
-    public void setOverallProgress(int i) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                overallProgressBar.setProgress(i);
-            }
-        });
-
+    public void setOverallProgress(double i) {
+        Platform.runLater( () ->
+            totalProgressBar.setProgress(i));
     }
 
     public void updateSingleProductProgress(double step) {
@@ -336,10 +321,7 @@ public class MainAppController {
     public void nullifyProgress() {
         Platform.runLater(() -> {
         singleProductProgresssBar.setProgress(0d);
-        if (overallProgressBar.progressProperty().isBound()) {
-            overallProgressBar.progressProperty().unbind();
-        }
-        overallProgressBar.setProgress(0d);
+        totalProgressBar.setProgress(0d);
         downloadingProductLabel.setText("Product");
         });
     }

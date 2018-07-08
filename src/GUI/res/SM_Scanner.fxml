@@ -142,7 +142,7 @@
             <GridPane fx:id="progressRegion" prefHeight="40.0" vgap="3.0">
                <children>
                   <ProgressBar fx:id="singleProductProgresssBar" progress="0.0" styleClass="progressBar" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
-                  <ProgressBar fx:id="overallProgressBar" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <ProgressBar fx:id="totalProgressBar" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <GridPane.margin>
                         <Insets />
                      </GridPane.margin>

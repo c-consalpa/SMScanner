@@ -35,7 +35,7 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void running() {
         super.running();
-        controller.setOverallProgress(0);
+        controller.setOverallProgress(0d);
     }
 
     @Override
@@ -76,11 +76,11 @@ public class DownloadTask extends Task<String> {
             DProduct dProduct = new DProduct(product, version, controller);
             int latestBuildNumber = dProduct.getLatestBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
-//            if (currentBuildNumber == latestBuildNumber) {
-//                controller.consoleLog("Current " + product + " " + version +
-//                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
-//                continue;
-//            } else {
+            if (currentBuildNumber == latestBuildNumber) {
+                controller.consoleLog("Current " + product + " " + version +
+                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
+                continue;
+            } else {
                 FSUtils.cleanupFolders(product, version);
                 File remoteFile = dProduct.getDownloadFromURL(latestBuildNumber);
                 if (remoteFile == null) {
@@ -99,15 +99,17 @@ public class DownloadTask extends Task<String> {
                             MNotification mNotification = new MNotification(product, String.valueOf(latestBuildNumber), localFile.getParentFile());
                             mNotification.show();
                         } catch (IOException e) {
-                            System.out.println("Can't componse notification stage;");
+                            System.out.println("Can't compose notification stage;");
                             e.printStackTrace();
                         }
                     });
                 }
-//            }
+            }
 
             if (!isCancelled()) {
-                controller.setOverallProgress(i);
+                controller.setOverallProgress((i + 1) * ((double) 1 / products.length));
+            } else {
+                    controller.nullifyProgress();
             }
         }
     }
@@ -120,8 +122,8 @@ public class DownloadTask extends Task<String> {
             to.mkdirs();
         }
         // vars to calulate time elapsed per 1 download
-        long startTime = 0;
-        long endTime = 0;
+        long startTime;
+        long endTime;
 
         //      fields used to update the progress of download process:
         final long FILE_SIZE = from.length();
@@ -129,7 +131,7 @@ public class DownloadTask extends Task<String> {
         final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
         double threshold = progressGraduationUnit;
         long currentByte = 0;
-        double progressUpdateFireCount = 1; // 2 because
+        double progressUpdateFireCount = 1;
         try (
                 BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
                 BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
