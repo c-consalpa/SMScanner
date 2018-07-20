@@ -55,7 +55,6 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.sizeToScene();
-//        primaryStage.setHeight(392);
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
         preventClosingIfRunning(primaryStage);
@@ -63,12 +62,12 @@ public class MainApp extends Application {
     }
 
     private void preventClosingIfRunning(Stage stage) {
-        stage.setOnCloseRequest(we -> {
+        stage.setOnCloseRequest(closeEvent -> {
             stage.hide();
-            if (SystemTray.isSupported() && controller.taskIsActive()) {
-                String currentlyDownloadingBuildName = controller.getCurrentlyDownloadingBuild();
-                controller.addAppToTray(currentlyDownloadingBuildName, stage);
-                we.consume();
+            if (SystemTray.isSupported()) {
+
+                controller.addAppToTray(stage);
+                closeEvent.consume();
             } else {
                 Platform.exit();
             }
