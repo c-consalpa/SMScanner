@@ -34,8 +34,7 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        controller.consoleLog("DOWNLOAD CYCLE COMPLETE");
-        controller.consoleLog("***********");
+
         System.out.println(getLastValue());
     }
 

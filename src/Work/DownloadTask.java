@@ -7,6 +7,7 @@ import GUI.MainAppController;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Date;
 
 
@@ -16,6 +17,7 @@ public class DownloadTask extends Task<String> {
     private final String version;
     //This field is queried by mainApp to get what is currently downloading;
     private String currentlyDownloadedBuild;
+    private int errorsCount = 0;
 
     public DownloadTask(String[] products, String version, MainAppController controller) {
         this.products = products;
@@ -28,8 +30,13 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        System.out.println("TASK SUCCESS");
         controller.nullifyProgress();
+        if (errorsCount > 0) {
+            controller.consoleLog("CYCLE COMPLETE WITH ERRORS: " + errorsCount);
+        } else {
+            controller.consoleLog("CYCLE COMPLETE");
+        }
+        controller.consoleLog("***********");
     }
 
     @Override
@@ -50,6 +57,7 @@ public class DownloadTask extends Task<String> {
         Exception e = (Exception) getException();
         System.out.println(e.toString());
         System.out.println("TASK FAILED");
+        System.out.println(Arrays.toString(e.getStackTrace()));
         controller.consoleLog("***********");
     }
 
@@ -69,34 +77,50 @@ public class DownloadTask extends Task<String> {
         }
 
         for (int i = 0; i < products.length; i++) {
-            String product = products[i];
+            String productName = products[i];
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) continue;
-            currentlyDownloadedBuild = product;
-            DProduct dProduct = new DProduct(product, version, controller);
+            currentlyDownloadedBuild = productName;
+            DProduct dProduct;
+            try {
+                dProduct = new DProduct(productName, version, controller);
+            } catch (Exception e) {
+                controller.consoleLog(e.getMessage());
+                controller.setOverallProgress((i + 1) * ((double) 1 / products.length));
+                errorsCount++;
+                continue;
+            }
             int latestBuildNumber = dProduct.getLatestBuildNumber();
-            int currentBuildNumber = dProduct.getCurrentBuildNumber(product, version);
+            int currentBuildNumber = dProduct.getCurrentBuildNumber(productName, version);
             if (currentBuildNumber == latestBuildNumber) {
-                controller.consoleLog("Current " + product + " " + version +
-                                     "(" + currentBuildNumber + ")" + " is up-to-date; Skipping download..");
+                controller.consoleLog("Current " + productName
+                                        + " " + version
+                                        + "(" + currentBuildNumber + ") "
+                                        + "is up-to-date; Skipping download..");
+                controller.setOverallProgress((i + 1) * ((double) 1 / products.length));
                 continue;
             } else {
-                FSUtils.cleanupFolders(product, version);
-                File remoteFile = dProduct.getDownloadFromURL(latestBuildNumber);
-                if (remoteFile == null) {
-//                    continue to next product if install file cannot be found
+                FSUtils.cleanupFolders(productName, version);
+                File remoteFile = null;
+                try {
+                    remoteFile = dProduct.getDownloadURL(latestBuildNumber);
+                } catch (FileNotFoundException e) {
+                    controller.consoleLog(e.getMessage());
+                    controller.setOverallProgress((i + 1) * ((double) 1 / products.length));
+                    errorsCount++;
                     continue;
                 }
                 String productFileName = remoteFile.getName();
                 File localFile = dProduct.getToURL(productFileName);
-                boolean downloadSuccessfull = false;
-                controller.updateDownloadedProductName(product);
+
+                controller.updateDownloadedProductName(productName);
+                boolean downloadSuccessfull;
                 downloadSuccessfull = downloadFiles(remoteFile, localFile);
                 if (downloadSuccessfull) {
-                    dProduct.persistLatestDownload(localFile.getParentFile(), product, latestBuildNumber);
+                    dProduct.persistLatestDownload(localFile.getParentFile(), productName, latestBuildNumber);
                     Platform.runLater(() -> {
                         try {
-                            MNotification mNotification = new MNotification(product, String.valueOf(latestBuildNumber), localFile.getParentFile());
+                            MNotification mNotification = new MNotification(productName, String.valueOf(latestBuildNumber), localFile.getParentFile());
                             mNotification.show();
                         } catch (IOException e) {
                             System.out.println("Can't compose notification stage;");

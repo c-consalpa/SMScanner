@@ -23,32 +23,35 @@ public class DProduct {
     private MainAppController controller;
     private String productName;
 
-    public DProduct(String product, String version, MainAppController controller) {
+    public DProduct(String productName, String productVersion, MainAppController controller) throws FileNotFoundException {
         productsRemoteFolder = new File(Common.BASE_PATH +
                     Common.FS_DELIMITER +
-                    version +
+                    productVersion +
                     Common.FS_DELIMITER +
-                    product);
+                    productName);
+        if(!productsRemoteFolder.exists()) {
+            throw new FileNotFoundException("Cannot find directory: " + productsRemoteFolder.getAbsolutePath());
+        }
 
         productsHomeFolder = new File(Common.HOMEFS_BUILDS_FOLDER +
                 FS_DELIMITER +
-                version +
+                productVersion +
                 FS_DELIMITER +
-                product +
+                productName +
                 FS_DELIMITER);
         this.controller = controller;
-        this.productName = product;
+        this.productName = productName;
     }
 
     public int getLatestBuildNumber() {
         int biggestnum = 0;
-        if (productsRemoteFolder ==null) {
+        if (productsRemoteFolder == null) {
             System.out.println("Cannot get builds list;");
             return biggestnum;
         }
-        String[] buildnumberFolders = productsRemoteFolder.list();
-        for (String buildnumberFolder:
-             buildnumberFolders) {
+
+        String[] buildsFoldersArr = productsRemoteFolder.list();
+        for (String buildnumberFolder : buildsFoldersArr) {
             if (buildnumberFolder.matches("\\d+") && (Integer.parseInt(buildnumberFolder) > biggestnum)) {
                 biggestnum = Integer.parseInt(buildnumberFolder);
             }
@@ -72,21 +75,13 @@ public class DProduct {
         return buildNumber;
     }
 
-    public File getDownloadFromURL(int buildNumber) {
+    public File getDownloadURL(int buildNumber) throws FileNotFoundException {
         File remoteFolder = new File(productsRemoteFolder, String.valueOf(buildNumber));
         if (!remoteFolder.exists()) {
-            System.out.println("Can't locate remote build folder.");
-            return null;
+            throw new FileNotFoundException("Folder does not exist: " + remoteFolder);
         }
-        File from = null;
-        try {
-            from = pickSuitableFile(remoteFolder);
-        } catch (FileNotFoundException e) {
-            controller.consoleLog(e.getMessage());
-            controller.consoleLog("Skipping product: " + productName);
-            return null;
-        }
-        return from;
+            File from = pickSuitableFile(remoteFolder);
+            return from;
     }
 
     private File pickSuitableFile(File buildNumberFolder) throws FileNotFoundException {
@@ -101,7 +96,6 @@ public class DProduct {
                     return artifactsInFolder[j];
                 }
             }
-
         }
         throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
     }
