@@ -15,8 +15,7 @@ import static Utils.Common.*;
 public class FSUtils {
 
     public static void initHomeFolders(String[] products, String productVersion) {
-        for (String productName:
-             products) {
+        for (String productName: products) {
             File buildsFolder = new File(HOMEFS_BUILDS_FOLDER +
                     FS_DELIMITER +
                     productVersion +
@@ -63,11 +62,6 @@ public class FSUtils {
                     e.printStackTrace();
                 }
             }
-
-
         }
-
     }
-
-
 }

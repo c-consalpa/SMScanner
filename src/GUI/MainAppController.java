@@ -239,23 +239,29 @@ public class MainAppController {
         System.exit(0);
     }
 
-    public boolean taskIsActive() {
-        DownloadService runningService = getDownloadService();
-        if (runningService != null && runningService.getState().equals(Worker.State.RUNNING)) {
-            return true;
+    public boolean cycleIsRunning() {
+        if (downloadService == null) {
+            return false;
         }
-        return false;
+        Worker.State cycleState = downloadService.getState();
+        if ( cycleState != Worker.State.FAILED ||
+             cycleState != Worker.State.CANCELLED ) {
+                return true;
+            } else {
+                return false;
+        }
     }
 
-    public String getCurrentlyDownloadingBuild() {
-        if (downloadService!=null) {
-            return downloadService.currentTask.getCurrentlyDownloadedBuild();
+    public String getCurrentlyDownloadingBuildName() {
+        if (cycleIsRunning()) {
+            return downloadService.currentTask.getCurrentBuildName();
         } else {
-            return null;
+            return "";
         }
     }
 
-    public void addAppToTray(String currentlyDownloadingBuildName, Stage primaryStage) {
+    public void addAppToTray(Stage primaryStage) {
+        String currentlyDownloadingBuildName = getCurrentlyDownloadingBuildName();
         SystemTray tray = SystemTray.getSystemTray();
         java.awt.Image image = null;
         try {
@@ -263,29 +269,33 @@ public class MainAppController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        java.awt.MenuItem menuItemQuit = new java.awt.MenuItem("Quit");
-        menuItemQuit.addActionListener(e -> {
-            promptConfirmation(currentlyDownloadingBuildName);
+        java.awt.MenuItem menuItem_quit = new java.awt.MenuItem("Quit");
+        menuItem_quit.addActionListener(e ->
+            promptConfirmation(currentlyDownloadingBuildName)
+        );
+        java.awt.MenuItem menuItem_restore = new java.awt.MenuItem("Restore");
+        menuItem_restore.addActionListener(e -> {
+            if (MainWindowisHidden) {
+                Platform.runLater(() -> primaryStage.show());
+                tray.remove(tray.getTrayIcons()[0]);
+                MainWindowisHidden = false;
+            }
         });
-        java.awt.MenuItem menuItemRestore= new java.awt.MenuItem("Restore");
-        menuItemRestore.addActionListener(e -> {
-            if (MainWindowisHidden) Platform.runLater(() -> primaryStage.show());
-            tray.remove(tray.getTrayIcons()[0]);
-        });
-        PopupMenu pMenu = new PopupMenu();
-        pMenu.add(menuItemRestore);
-        pMenu.add(menuItemQuit);
-        TrayIcon trayIcon = new TrayIcon(image, "Currently downloading...", pMenu );
+        PopupMenu trayRClickMenu = new PopupMenu();
+        trayRClickMenu.add(menuItem_restore);
+        trayRClickMenu.add(menuItem_quit);
+        TrayIcon trayIcon = new TrayIcon(image, "Currently downloading...", trayRClickMenu );
         try {
             tray.add(trayIcon);
         } catch (AWTException e) {
             e.printStackTrace();
         }
-        String trayNotificationMessage = "Build is currently downloading";
-        if (currentlyDownloadingBuildName!=null) {
-            trayNotificationMessage += (": " + currentlyDownloadingBuildName);
+        String trayNotificationMessage = null;
+        if (!currentlyDownloadingBuildName.isEmpty()) {
+            trayNotificationMessage = ("Build is currently downloading: " + currentlyDownloadingBuildName);
         }
-        trayIcon.displayMessage("Running in daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
+        trayIcon.displayMessage("Running as daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
+        MainWindowisHidden = true;
     }
 
     private void promptConfirmation(String currentlyDownloadingBuildName) {
@@ -294,9 +304,17 @@ public class MainAppController {
             @Override
             public void run() {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                String alertContextMsg;
+                if (!currentlyDownloadingBuildName.isEmpty()) {
+                    alertContextMsg = "The following build is currently downloading: " + activeDownloadingBuildName + ";\r\n" +
+                            "queued builds: " + "buildsLeftNum();";
+                } else {
+                    alertContextMsg = "No builds are downloaded at the moment;";
+                }
+
                 alert.setTitle("Quit?");
                 alert.setHeaderText("Do you really want to quit?");
-                alert.setContentText("The following build is currently downloading: " + activeDownloadingBuildName);
+                alert.setContentText(alertContextMsg);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK){
                     terminateAndQuit();

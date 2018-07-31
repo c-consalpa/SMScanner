@@ -23,7 +23,6 @@ public class DownloadTask extends Task<String> {
         this.products = products;
         this.version = version;
         this.controller = controller;
-
         Utils.FSUtils.initHomeFolders(products, version);
     }
 
@@ -207,7 +206,7 @@ public class DownloadTask extends Task<String> {
         controller.consoleLog("Connection OK");
     }
 
-    public String getCurrentlyDownloadedBuild() {
-        return currentlyDownloadedBuild;
+    public String getCurrentBuildName() {
+        return (currentlyDownloadedBuild == null)?"":currentlyDownloadedBuild;
     }
 }

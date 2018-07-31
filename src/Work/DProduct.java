@@ -59,17 +59,17 @@ public class DProduct {
         return biggestnum;
     }
 
-    public int getCurrentBuildNumber(String prdctNm, String prdctVrsn) {
+    public int getCurrentBuildNumber(String productName, String productVersion) {
         int buildNumber = 0;
         File propsDstn = new File(HOMEFS_BUILDS_FOLDER +
-                FS_DELIMITER +
-                prdctVrsn +
-                FS_DELIMITER +
-                prdctNm +
-                FS_DELIMITER +
+                FS_DELIMITER    +
+                productVersion  +
+                FS_DELIMITER    +
+                productName     +
+                FS_DELIMITER    +
                 Utils.Common.PROPERTY_FILE_NAME);
         if (propsDstn.exists()) {
-        //           If file not existing - buildNumber=0;
+        //           If file does not exits -> buildNumber = 0;
             buildNumber = Common.getBuildNumberFromProps(propsDstn, PROPERTY_BUILD_NUMBER_KEY_LOCAL);
         }
         return buildNumber;

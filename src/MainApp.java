@@ -65,9 +65,9 @@ public class MainApp extends Application {
     private void preventClosingIfRunning(Stage stage) {
         stage.setOnCloseRequest(we -> {
             stage.hide();
-            if (SystemTray.isSupported() && controller.taskIsActive()) {
-                String currentlyDownloadingBuildName = controller.getCurrentlyDownloadingBuild();
-                controller.addAppToTray(currentlyDownloadingBuildName, stage);
+
+            if (SystemTray.isSupported()) {
+                controller.addAppToTray(stage);
                 we.consume();
             } else {
                 Platform.exit();
