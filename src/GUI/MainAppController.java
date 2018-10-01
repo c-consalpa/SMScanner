@@ -331,7 +331,7 @@ public class MainAppController {
             totalProgressBar.setProgress(i));
     }
 
-    public void updateSingleProductProgress(double step) {
+    public void setIndividualProgress(double step) {
         Platform.runLater(() -> {
             singleProductProgresssBar.setProgress(step);
         });
@@ -345,7 +345,7 @@ public class MainAppController {
         });
     }
 
-    public void updateDownloadedProductName(String product) {
+    public void setCurrentArtifactName(String product) {
         final int Ellipsis_threshold = 10;
 
         Platform.runLater(() -> {

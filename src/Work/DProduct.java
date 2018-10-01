@@ -29,6 +29,13 @@ public class DProduct {
         this.productName = productName;
         this.productVersion = productVersion;
         this.controller = controller;
+
+        productsHomeFolder = new File(Common.HOMEFS_BUILDS_FOLDER +
+                FS_DELIMITER +
+                productVersion +
+                FS_DELIMITER +
+                productName +
+                FS_DELIMITER);
     }
 
     public void findProductFolder() throws FileNotFoundException {

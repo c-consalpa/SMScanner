@@ -115,7 +115,7 @@ public class DownloadTask extends Task<String> {
                 String artifactName_remote = artifact_remote.getName();
                 File artifact_local = dProduct.buildPath2Artifact_local(artifactName_remote);
 
-                controller.updateDownloadedProductName(productName);
+                controller.setCurrentArtifactName(productName);
                 boolean downloadSuccessful;
                 downloadSuccessful = downloadFiles(artifact_remote, artifact_local);
                 if (downloadSuccessful) {
@@ -140,41 +140,43 @@ public class DownloadTask extends Task<String> {
         }
     }
 
-    private boolean downloadFiles(File from, File to) {
+    private boolean downloadFiles(File pathToArtifact_remote, File pathToArtifact_local) {
         //TODO rewrite this awful 165-year-old-slow-granddad-like downloader
-        controller.consoleLog("INITIATING DOWNLOAD : " + from);
-        controller.updateSingleProductProgress(0d);
-        if (!to.getParentFile().exists()) {
-            to.mkdirs();
+        controller.consoleLog("INITIATING DOWNLOAD : " + pathToArtifact_remote);
+        controller.setIndividualProgress(0d);
+//        check destination dirs for changes made within previous cycle:
+        if (!pathToArtifact_local.getParentFile().exists()) {
+            pathToArtifact_local.mkdirs();
         }
         // vars to calulate time elapsed per 1 download
         long startTime;
         long endTime;
-
         //      fields used to update the progress of download process:
-        final long FILE_SIZE = from.length();
+        final long FILE_SIZE = pathToArtifact_remote.length();
         final double PROGRESS_PRECISION = 100;
         final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
         double threshold = progressGraduationUnit;
         long currentByte = 0;
         double progressUpdateFireCount = 1;
+
         try (
-                BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(from));
-                BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(to))
+                BufferedInputStream bfIn = new BufferedInputStream(new FileInputStream(pathToArtifact_remote));
+                BufferedOutputStream bfOut = new BufferedOutputStream(new FileOutputStream(pathToArtifact_local))
         ) {
+//            int enough for files up to 2.1 GB each
             int tmpByte;
             startTime = System.currentTimeMillis();
             while ((tmpByte = bfIn.read()) != -1) {
                 currentByte++;
                 if (isCancelled()) {
                     bfOut.close();
-                    to.delete();
-                    controller.consoleLog("Task cancelled. Removing file: " + to);
+                    pathToArtifact_local.delete();
+                    controller.consoleLog("Task cancelled. Removing file: " + pathToArtifact_local);
                     return false;
                 }
         //  check if another 1/PRECISION portion of file is downloaded:
                 if(currentByte >= threshold) {
-                    controller.updateSingleProductProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
+                    controller.setIndividualProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
                     threshold += progressGraduationUnit;
                 }
                 bfOut.write(tmpByte);
@@ -184,9 +186,8 @@ public class DownloadTask extends Task<String> {
             return false;
         }
         endTime = System.currentTimeMillis();
-        controller.consoleLog("FILE DOWNLOADED: " + to);
+        controller.consoleLog("FILE DOWNLOADED: " + pathToArtifact_local);
         controller.consoleLog(getElapsedTime(endTime - startTime));
-
         return true;
     }
 
