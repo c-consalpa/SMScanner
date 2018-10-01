@@ -2,7 +2,6 @@ package Work;
 
 import GUI.MainAppController;
 import Utils.Common;
-import com.sun.javafx.collections.MappingChange;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,39 +17,35 @@ import static Utils.Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL;
  * Created by c-consalpa on 3/23/2018.
  */
 public class DProduct {
-    private File productsRemoteFolder;
+    private final String productName;
+    private final String productVersion;
+    private final MainAppController controller;
+
+    private File remoteArtifactsFolder;
     private File productsHomeFolder;
-    private MainAppController controller;
-    private String productName;
 
-    public DProduct(String productName, String productVersion, MainAppController controller) throws FileNotFoundException {
-        productsRemoteFolder = new File(Common.BASE_PATH +
-                    Common.FS_DELIMITER +
-                    productVersion +
-                    Common.FS_DELIMITER +
-                    productName);
-        if(!productsRemoteFolder.exists()) {
-            throw new FileNotFoundException("Cannot find directory: " + productsRemoteFolder.getAbsolutePath());
-        }
 
-        productsHomeFolder = new File(Common.HOMEFS_BUILDS_FOLDER +
-                FS_DELIMITER +
-                productVersion +
-                FS_DELIMITER +
-                productName +
-                FS_DELIMITER);
-        this.controller = controller;
+    public DProduct(String productName, String productVersion, MainAppController controller) {
         this.productName = productName;
+        this.productVersion = productVersion;
+        this.controller = controller;
+    }
+
+    public void findProductFolder() throws FileNotFoundException {
+        remoteArtifactsFolder = new File(Common.BASE_PATH +
+                Common.FS_DELIMITER +
+                productVersion +
+                Common.FS_DELIMITER +
+                productName);
+        if(!remoteArtifactsFolder.exists()) {
+            throw new FileNotFoundException("Cannot locate directory: " + remoteArtifactsFolder.getAbsolutePath());
+        }
     }
 
     public int getLatestBuildNumber() {
         int biggestnum = 0;
-        if (productsRemoteFolder == null) {
-            System.out.println("Cannot get builds list;");
-            return biggestnum;
-        }
 
-        String[] buildsFoldersArr = productsRemoteFolder.list();
+        String[] buildsFoldersArr = remoteArtifactsFolder.list();
         for (String buildnumberFolder : buildsFoldersArr) {
             if (buildnumberFolder.matches("\\d+") && (Integer.parseInt(buildnumberFolder) > biggestnum)) {
                 biggestnum = Integer.parseInt(buildnumberFolder);
@@ -75,13 +70,13 @@ public class DProduct {
         return buildNumber;
     }
 
-    public File getDownloadURL(int buildNumber) throws FileNotFoundException {
-        File remoteFolder = new File(productsRemoteFolder, String.valueOf(buildNumber));
+    public File buildPath2Artifact_remote(int buildNumber) throws FileNotFoundException {
+        File remoteFolder = new File(remoteArtifactsFolder, String.valueOf(buildNumber));
         if (!remoteFolder.exists()) {
             throw new FileNotFoundException("Folder does not exist: " + remoteFolder);
         }
-            File from = pickSuitableFile(remoteFolder);
-            return from;
+            File artifact = pickSuitableFile(remoteFolder);
+            return artifact;
     }
 
     private File pickSuitableFile(File buildNumberFolder) throws FileNotFoundException {
@@ -100,7 +95,7 @@ public class DProduct {
         throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
     }
 
-    public File getToURL(String productFileName) {
+    public File buildPath2Artifact_local(String productFileName) {
         if (!productsHomeFolder.exists()) {
             productsHomeFolder.mkdir();
         }

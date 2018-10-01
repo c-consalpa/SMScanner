@@ -78,17 +78,20 @@ public class DownloadTask extends Task<String> {
         for (int i = 0; i < products.length; i++) {
             String productName = products[i];
 //            if a product download is cancelled, no need to waste time with others in products[]:
-            if (isCancelled()) continue;
+            if (isCancelled()) return;
+
             currentlyDownloadedBuild = productName;
-            DProduct dProduct;
+            DProduct dProduct = new DProduct(productName, version, controller);
             try {
-                dProduct = new DProduct(productName, version, controller);
-            } catch (Exception e) {
+                dProduct.findProductFolder();
+            } catch (FileNotFoundException e) {
                 controller.consoleLog(e.getMessage());
                 controller.setOverallProgress((i + 1) * ((double) 1 / products.length));
                 errorsCount++;
                 continue;
             }
+            // if enbuild06/Builds/ProductName is found:
+
             int latestBuildNumber = dProduct.getLatestBuildNumber();
             int currentBuildNumber = dProduct.getCurrentBuildNumber(productName, version);
             if (currentBuildNumber == latestBuildNumber) {
@@ -100,26 +103,26 @@ public class DownloadTask extends Task<String> {
                 continue;
             } else {
                 FSUtils.cleanupFolders(productName, version);
-                File remoteFile = null;
+                File artifact_remote = null;
                 try {
-                    remoteFile = dProduct.getDownloadURL(latestBuildNumber);
+                    artifact_remote = dProduct.buildPath2Artifact_remote(latestBuildNumber);
                 } catch (FileNotFoundException e) {
                     controller.consoleLog(e.getMessage());
                     controller.setOverallProgress((i + 1) * ((double) 1 / products.length));
                     errorsCount++;
                     continue;
                 }
-                String productFileName = remoteFile.getName();
-                File localFile = dProduct.getToURL(productFileName);
+                String artifactName_remote = artifact_remote.getName();
+                File artifact_local = dProduct.buildPath2Artifact_local(artifactName_remote);
 
                 controller.updateDownloadedProductName(productName);
-                boolean downloadSuccessfull;
-                downloadSuccessfull = downloadFiles(remoteFile, localFile);
-                if (downloadSuccessfull) {
-                    dProduct.persistLatestDownload(localFile.getParentFile(), productName, latestBuildNumber);
+                boolean downloadSuccessful;
+                downloadSuccessful = downloadFiles(artifact_remote, artifact_local);
+                if (downloadSuccessful) {
+                    dProduct.persistLatestDownload(artifact_local.getParentFile(), productName, latestBuildNumber);
                     Platform.runLater(() -> {
                         try {
-                            MNotification mNotification = new MNotification(productName, String.valueOf(latestBuildNumber), localFile.getParentFile());
+                            MNotification mNotification = new MNotification(productName, String.valueOf(latestBuildNumber), artifact_local.getParentFile());
                             mNotification.show();
                         } catch (IOException e) {
                             System.out.println("Can't compose notification stage;");
