@@ -35,7 +35,7 @@ import java.util.Optional;
 
 public class MainAppController {
     private DownloadService downloadService;
-    private boolean MainWindowisHidden = true;
+    private boolean MainWindowisHidden = false;
 
     public DownloadService getDownloadService() {
         return downloadService;
@@ -244,7 +244,10 @@ public class MainAppController {
             return false;
         }
         Worker.State cycleState = downloadService.getState();
-        if ( cycleState != Worker.State.FAILED ||
+
+
+
+        if ( cycleState != Worker.State.FAILED &&
              cycleState != Worker.State.CANCELLED ) {
                 return true;
             } else {
@@ -252,7 +255,7 @@ public class MainAppController {
         }
     }
 
-    public String getCurrentlyDownloadingBuildName() {
+    public String getCurrentArtifactName() {
         if (cycleIsRunning()) {
             return downloadService.currentTask.getCurrentBuildName();
         } else {
@@ -261,7 +264,7 @@ public class MainAppController {
     }
 
     public void addAppToTray(Stage primaryStage) {
-        String currentlyDownloadingBuildName = getCurrentlyDownloadingBuildName();
+        String currentArtifactName = getCurrentArtifactName();
         SystemTray tray = SystemTray.getSystemTray();
         java.awt.Image image = null;
         try {
@@ -271,7 +274,7 @@ public class MainAppController {
         }
         java.awt.MenuItem menuItem_quit = new java.awt.MenuItem("Quit");
         menuItem_quit.addActionListener(e ->
-            promptConfirmation(currentlyDownloadingBuildName)
+            promptConfirmation(currentArtifactName)
         );
         java.awt.MenuItem menuItem_restore = new java.awt.MenuItem("Restore");
         menuItem_restore.addActionListener(e -> {
@@ -291,22 +294,26 @@ public class MainAppController {
             e.printStackTrace();
         }
         String trayNotificationMessage = null;
-        if (!currentlyDownloadingBuildName.isEmpty()) {
-            trayNotificationMessage = ("Build is currently downloading: " + currentlyDownloadingBuildName);
+        if (cycleIsRunning()) {
+            trayNotificationMessage = ("Build is currently downloading: " + currentArtifactName);
+            trayIcon.displayMessage("Running as daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
+            MainWindowisHidden = true;
+        } else {
+            Platform.exit();
         }
-        trayIcon.displayMessage("Running as daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
-        MainWindowisHidden = true;
+
+
     }
 
     private void promptConfirmation(String currentlyDownloadingBuildName) {
-        final String activeDownloadingBuildName = currentlyDownloadingBuildName;
+        final String currentArtifactName = currentlyDownloadingBuildName;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 String alertContextMsg;
                 if (!currentlyDownloadingBuildName.isEmpty()) {
-                    alertContextMsg = "The following build is currently downloading: " + activeDownloadingBuildName + ";\r\n" +
+                    alertContextMsg = "The following build is currently downloading: " + currentArtifactName + ";\r\n" +
                             "queued builds: " + "buildsLeftNum();";
                 } else {
                     alertContextMsg = "No builds are downloaded at the moment;";
