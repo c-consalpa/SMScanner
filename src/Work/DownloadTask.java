@@ -194,11 +194,35 @@ public class DownloadTask extends Task<String> {
     private String getElapsedTime(long elapsed) {
         StringBuffer sb = new StringBuffer();
         sb.append("Elapsed time: ");
-        if (elapsed/1000/60/60 >= 1) sb.append((int) elapsed/1000/60/60 + " hours ");
-        if (elapsed/1000/60 >= 1) sb.append((int) elapsed/1000/60 + " minutes ");
-        if (elapsed/1000 >= 1) sb.append((int) elapsed/1000%60 + " seconds ");
 
-        return (sb.toString());
+        int remain = (int) (elapsed / 1000);
+        int secs = 0;
+        int mins = 0;
+        int hrs = 0;
+
+        // calc hours
+        if (remain / 3600 > 0) {
+            hrs = remain / 3600;
+            remain = remain - hrs * 3600;
+            sb.append(hrs);
+            sb.append(" hour");
+            if (hrs > 1) sb.append("s");
+            sb.append(" ");
+        }
+        // calc minutes
+        if (remain / 60 > 0) {
+            mins = remain / 60;
+            remain = remain - mins * 60;
+        }
+        sb.append(mins + " minute");
+        if (mins > 1) sb.append("s");
+        sb.append(" ");
+
+        // the rest are seconds
+        secs = remain;
+        sb.append(secs + " seconds");
+
+        return sb.toString();
     }
 
     private void checkConnection() throws IOException {
