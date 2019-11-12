@@ -25,7 +25,7 @@ public class DProduct {
     private File productsHomeFolder;
 
 
-    public DProduct(String productName, String productVersion, MainAppController controller) {
+    DProduct(String productName, String productVersion, MainAppController controller) {
         this.productName = productName;
         this.productVersion = productVersion;
         this.controller = controller;
@@ -38,7 +38,7 @@ public class DProduct {
                 FS_DELIMITER);
     }
 
-    public void findProductFolder() throws FileNotFoundException {
+    void findProductFolder() throws FileNotFoundException {
         remoteArtifactsFolder = new File(Common.BASE_PATH +
                 Common.FS_DELIMITER +
                 productVersion +
@@ -49,7 +49,7 @@ public class DProduct {
         }
     }
 
-    public int getLatestBuildNumber() {
+    int getLatestBuildNumber() {
         int biggestnum = 0;
 
         String[] buildsFoldersArr = remoteArtifactsFolder.list();
@@ -61,7 +61,7 @@ public class DProduct {
         return biggestnum;
     }
 
-    public int getCurrentBuildNumber(String productName, String productVersion) {
+    int getCurrentBuildNumber(String productName, String productVersion) {
         int buildNumber = 0;
         File propsDstn = new File(HOMEFS_BUILDS_FOLDER +
                 FS_DELIMITER    +
@@ -77,7 +77,7 @@ public class DProduct {
         return buildNumber;
     }
 
-    public File buildPath2Artifact_remote(int buildNumber) throws FileNotFoundException {
+    File buildPath2Artifact_remote(int buildNumber) throws FileNotFoundException {
         File remoteFolder = new File(remoteArtifactsFolder, String.valueOf(buildNumber));
         if (!remoteFolder.exists()) {
             throw new FileNotFoundException("Folder does not exist: " + remoteFolder);
@@ -102,14 +102,14 @@ public class DProduct {
         throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
     }
 
-    public File buildPath2Artifact_local(String productFileName) {
+    File buildPath2Artifact_local(String productFileName) {
         if (!productsHomeFolder.exists()) {
             productsHomeFolder.mkdir();
         }
         return new File(productsHomeFolder, productFileName);
     }
 
-    public void persistLatestDownload(File targetFolderPath, String productName, int latestBuildNumber) {
+    void persistLatestDownload(File targetFolderPath, String productName, int latestBuildNumber) {
         Properties props = new Properties();
         try (
                 FileOutputStream propsOutputStream = new FileOutputStream(

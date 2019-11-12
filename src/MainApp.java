@@ -1,10 +1,8 @@
 import GUI.MainAppController;
 import javafx.application.Application;
 import javafx.application.Platform;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -57,13 +55,18 @@ public class MainApp extends Application {
         primaryStage.sizeToScene();
 //        primaryStage.setHeight(392);
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("GUI/res/GetBuildsIcon.png")));
+//        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("GUI/res/GetBuildsIcon.png")));
         Platform.setImplicitExit(false);
         preventClosingIfRunning(primaryStage);
 
     }
 
     private void preventClosingIfRunning(Stage stage) {
+
         stage.setOnCloseRequest(we -> {
+            boolean cycleStatus = controller.cycleIsRunning();
+            System.out.println(cycleStatus);
+
             stage.hide();
 
             if (SystemTray.isSupported()) {

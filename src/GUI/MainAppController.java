@@ -37,9 +37,6 @@ public class MainAppController {
     private DownloadService downloadService;
     private boolean MainWindowisHidden = false;
 
-    public DownloadService getDownloadService() {
-        return downloadService;
-    }
 
     @FXML
     private AnchorPane root;
@@ -174,7 +171,7 @@ public class MainAppController {
     }
 
     private void setupVersionChoiceList() {
-        String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0", "9.1.0"};
+        String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0"};
         ObservableList<String> versionObsList = FXCollections.observableArrayList(versionsArr);
         choice_version.setItems(versionObsList);
 //        last array elem is default
@@ -248,7 +245,8 @@ public class MainAppController {
 
 
         if ( cycleState != Worker.State.FAILED &&
-             cycleState != Worker.State.CANCELLED ) {
+                cycleState != Worker.State.CANCELLED &&
+                cycleState != Worker.State.SCHEDULED) {
                 return true;
             } else {
                 return false;
