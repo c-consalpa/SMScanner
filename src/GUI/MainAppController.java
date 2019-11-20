@@ -37,7 +37,6 @@ public class MainAppController {
     private DownloadService downloadService;
     private boolean MainWindowisHidden = false;
 
-
     @FXML
     private AnchorPane root;
 
@@ -102,8 +101,8 @@ public class MainAppController {
         if (!validateUIFields()) return;
         disableUI(true);
 
-        String[] products = new String[getProducts().size()];
-        System.arraycopy(getProducts().toArray(), 0, products, 0, getProducts().size());
+        String[] products = new String[getProductsFromCheckboxes().size()];
+        System.arraycopy(getProductsFromCheckboxes().toArray(), 0, products, 0, getProductsFromCheckboxes().size());
         String version = getVersion();
         File destination = getDestination2DownloadFiles();
         int pollingInterval = getPollInterval();
@@ -126,7 +125,7 @@ public class MainAppController {
     }
 
     private boolean validateUIFields() {
-        if (getProducts().size() < 1) {
+        if (getProductsFromCheckboxes().size() < 1) {
             blinkElement(prod_checkBoxes);
             return false;
         } else if (destinationDirectoryTextField.getText().isEmpty()) {
@@ -185,7 +184,7 @@ public class MainAppController {
         choice_poll.getSelectionModel().select(pollIntervalList.indexOf(24));
     }
 
-    private List<String> getProducts() {
+    private List<String> getProductsFromCheckboxes() {
         List<String> l = new ArrayList<>(5);
         for (Object node :
                 prod_checkBoxes.getChildren()) {
@@ -236,29 +235,25 @@ public class MainAppController {
         System.exit(0);
     }
 
-    public boolean cycleIsActive() {
-        if (downloadService == null) {
-            return false;
-        }
+    public boolean isDownloadingNow() {
+        if (downloadService == null) return false;
 
         Worker.State cycleState = downloadService.getState();
-
-        if (    cycleState != Worker.State.FAILED &&
-                cycleState != Worker.State.CANCELLED &&
-                cycleState != Worker.State.SCHEDULED) {
-                return true;
-            } else {
-                return false;
+        if (cycleState.equals(Worker.State.RUNNING)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
-//    TODO: HERE must be a check for the act of bytes transmission, not for task running
-    public String getCurrentArtifactName() {
-        if (cycleIsActive()) {
-            return downloadService.currentTask.getCurrentBuildName();
+
+    public void getState() {
+        if (downloadService == null) {
+            System.out.println("donwload service is null");
         } else {
-            return "";
+            System.out.println(downloadService.getState());
         }
+
     }
 
     public void addAppToTray(Stage primaryStage) {
@@ -272,7 +267,7 @@ public class MainAppController {
         }
         java.awt.MenuItem menuItem_quit = new java.awt.MenuItem("Quit");
         menuItem_quit.addActionListener(e ->
-            prompTrayQuitConfirmation(currentArtifactName)
+            prompTrayQuitConfirmation()
         );
         java.awt.MenuItem menuItem_restore = new java.awt.MenuItem("Restore");
         menuItem_restore.addActionListener(e -> {
@@ -282,6 +277,7 @@ public class MainAppController {
                 MainWindowisHidden = false;
             }
         });
+
         PopupMenu trayRClickMenu = new PopupMenu();
         trayRClickMenu.add(menuItem_restore);
         trayRClickMenu.add(menuItem_quit);
@@ -291,31 +287,43 @@ public class MainAppController {
         } catch (AWTException e) {
             e.printStackTrace();
         }
-        String trayNotificationMessage = null;
+        String trayNotificationMessage = "Idle. Next download in: { // TODO}";
 
-        //    TODO: HERE must be a check for the act of download, not task running
-        if (cycleIsActive()) {
-        trayNotificationMessage = ("Build is currently downloading: " + currentArtifactName);
-        trayIcon.displayMessage("Running in background", trayNotificationMessage, TrayIcon.MessageType.INFO);
 
-            MainWindowisHidden = true;
-        } else {
-            Platform.exit();
+        if (isDownloadingNow()) {
+            trayNotificationMessage = ("Build is currently downloading: " + currentArtifactName);
         }
-
-
+        trayIcon.displayMessage("Running in background..", trayNotificationMessage, TrayIcon.MessageType.INFO);
+        MainWindowisHidden = true;
     }
 
-    private void prompTrayQuitConfirmation(String currentlyDownloadingBuildName) {
-        final String currentArtifactName = currentlyDownloadingBuildName;
+    public String getCurrentArtifactName() {
+        if (isDownloadingNow()) {
+            return downloadService.currentTask.getCurrentBuildName();
+        } else {
+            return null;
+        }
+    }
+
+    private void prompTrayQuitConfirmation() {
+        System.out.println("prompTrayQuitConfirmation");
+        String currentlyDownloadingBuildName;
+        if (downloadService != null && downloadService.currentTask != null) {
+            currentlyDownloadingBuildName = downloadService.currentTask.getCurrentBuildName();
+        } else {
+            currentlyDownloadingBuildName = null;
+        }
+
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 String alertContextMsg;
-                if (!currentlyDownloadingBuildName.isEmpty()) {
-                    alertContextMsg = "The following build is currently downloading: " + currentArtifactName + ";\r\n" +
-                            "queued builds: " + "buildsLeftNum();";
+                if (currentlyDownloadingBuildName != null) {
+                    alertContextMsg =   "The following build is currently downloading: "
+                                        + currentlyDownloadingBuildName
+                                        + ";\r\n"
+                                        + "queued builds: " + "buildsLeftNum();";
                 } else {
                     alertContextMsg = "No builds are downloaded at the moment;";
                 }

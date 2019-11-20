@@ -38,7 +38,7 @@ public class MainApp extends Application {
     }
 
     private void initLayout() {
-        primaryStage.setTitle("Build Puller");
+        primaryStage.setTitle("SMScanner");
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(this.getClass().getResource("GUI/res/SM_Scanner.fxml"));
         try {
@@ -62,9 +62,7 @@ public class MainApp extends Application {
     }
 
     private void preventClosingIfRunning(Stage stage) {
-
         stage.setOnCloseRequest(we -> {
-            boolean cycleStatus = controller.cycleIsActive();
             stage.hide();
             if (SystemTray.isSupported()) {
                 controller.addAppToTray(stage);

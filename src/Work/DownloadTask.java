@@ -236,6 +236,6 @@ public class DownloadTask extends Task<String> {
     }
 
     public String getCurrentBuildName() {
-        return (currentlyDownloadedBuild == null)?"none":currentlyDownloadedBuild;
+        return currentlyDownloadedBuild;
     }
 }
