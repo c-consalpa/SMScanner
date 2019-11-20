@@ -31,9 +31,9 @@ public class DownloadTask extends Task<String> {
         super.succeeded();
         controller.nullifyProgress();
         if (errorsCount > 0) {
-            controller.consoleLog("CYCLE COMPLETE WITH ERRORS: " + errorsCount);
+            controller.consoleLog("Download session complete with errors: " + errorsCount);
         } else {
-            controller.consoleLog("CYCLE COMPLETE");
+            controller.consoleLog("Download session complete");
         }
         controller.consoleLog("***********");
     }
@@ -47,7 +47,7 @@ public class DownloadTask extends Task<String> {
     @Override
     protected void cancelled() {
         super.cancelled();
-        System.out.println("TASK CANCELLED");
+        System.out.println("Download session cancelled");
     }
 
     @Override
@@ -55,16 +55,16 @@ public class DownloadTask extends Task<String> {
         super.failed();
         Exception e = (Exception) getException();
         System.out.println(e.toString());
-        System.out.println("TASK FAILED");
+        System.out.println("Download session failed");
         System.out.println(Arrays.toString(e.getStackTrace()));
         controller.consoleLog("***********");
     }
 
     @Override
     protected String call() {
-        controller.consoleLog("STARTING TASK: " + String.valueOf(new Date()));
+        controller.consoleLog("Starting download session: " + String.valueOf(new Date()));
         makeCycle();
-        return "";
+        return "DownloadTask finished " + this;
     }
 
     private void makeCycle() {
@@ -92,8 +92,8 @@ public class DownloadTask extends Task<String> {
             }
             // if enbuild06/Builds/ProductName is found:
 
-            int latestBuildNumber = dProduct.getLatestBuildNumber();
-            int currentBuildNumber = dProduct.getCurrentBuildNumber(productName, version);
+            int latestBuildNumber   = dProduct.getLatestBuildNumber();
+            int currentBuildNumber  = dProduct.getCurrentBuildNumber(productName, version);
             if (currentBuildNumber == latestBuildNumber) {
                 controller.consoleLog("Current " + productName
                                         + " " + version
@@ -118,6 +118,7 @@ public class DownloadTask extends Task<String> {
                 controller.setCurrentArtifactName(productName);
                 boolean downloadSuccessful;
                 downloadSuccessful = downloadFiles(artifact_remote, artifact_local);
+
                 if (downloadSuccessful) {
                     dProduct.persistLatestDownload(artifact_local.getParentFile(), productName, latestBuildNumber);
                     Platform.runLater(() -> {
@@ -142,7 +143,7 @@ public class DownloadTask extends Task<String> {
 
     private boolean downloadFiles(File pathToArtifact_remote, File pathToArtifact_local) {
         //TODO rewrite this awful 165-year-old-slow-granddad-like downloader
-        controller.consoleLog("INITIATING DOWNLOAD : " + pathToArtifact_remote);
+        controller.consoleLog("Initiating download: " + pathToArtifact_remote);
         controller.setIndividualProgress(0d);
 //        check destination dirs for changes made within previous cycle:
         if (!pathToArtifact_local.getParentFile().exists()) {
@@ -154,8 +155,8 @@ public class DownloadTask extends Task<String> {
         //      fields used to update the progress of download process:
         final long FILE_SIZE = pathToArtifact_remote.length();
         final double PROGRESS_PRECISION = 100;
-        final double progressGraduationUnit = FILE_SIZE / PROGRESS_PRECISION;
-        double threshold = progressGraduationUnit;
+        final double progressTickBytes = FILE_SIZE / PROGRESS_PRECISION;
+        double threshold = progressTickBytes;
         long currentByte = 0;
         double progressUpdateFireCount = 1;
 
@@ -177,7 +178,7 @@ public class DownloadTask extends Task<String> {
         //  check if another 1/PRECISION portion of file is downloaded:
                 if(currentByte >= threshold) {
                     controller.setIndividualProgress(++progressUpdateFireCount * ((double) 1 / PROGRESS_PRECISION));
-                    threshold += progressGraduationUnit;
+                    threshold += progressTickBytes;
                 }
                 bfOut.write(tmpByte);
             }
@@ -186,7 +187,7 @@ public class DownloadTask extends Task<String> {
             return false;
         }
         endTime = System.currentTimeMillis();
-        controller.consoleLog("FILE DOWNLOADED: " + pathToArtifact_local);
+        controller.consoleLog("File Downloaded: " + pathToArtifact_local);
         controller.consoleLog(getElapsedTime(endTime - startTime));
         return true;
     }
@@ -235,6 +236,6 @@ public class DownloadTask extends Task<String> {
     }
 
     public String getCurrentBuildName() {
-        return (currentlyDownloadedBuild == null)?"":currentlyDownloadedBuild;
+        return (currentlyDownloadedBuild == null)?"none":currentlyDownloadedBuild;
     }
 }

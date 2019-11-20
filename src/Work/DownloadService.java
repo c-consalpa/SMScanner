@@ -19,22 +19,18 @@ public class DownloadService extends ScheduledService<String> {
         this.products = products;
         this.version = version;
         this.destination = destination;
-
         controller = mainAppController;
     }
 
     @Override
     protected Task createTask() {
         currentTask = new DownloadTask(products, version, controller);
-
-
         return currentTask;
     }
 
     @Override
     protected void succeeded() {
         super.succeeded();
-
         System.out.println(getLastValue());
     }
 
@@ -42,12 +38,12 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void failed() {
         super.failed();
-        System.out.println("SERVICE FAILED. REASON: " + getException());
+        System.out.println("Service failed. Reason: " + getException());
     }
 
     @Override
     protected void cancelled() {
         super.cancelled();
-        System.out.println("SERVICE CANCELLED");
+        System.out.println("Service Cancelled");
     }
 }

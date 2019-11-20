@@ -236,15 +236,14 @@ public class MainAppController {
         System.exit(0);
     }
 
-    public boolean cycleIsRunning() {
+    public boolean cycleIsActive() {
         if (downloadService == null) {
             return false;
         }
+
         Worker.State cycleState = downloadService.getState();
 
-
-
-        if ( cycleState != Worker.State.FAILED &&
+        if (    cycleState != Worker.State.FAILED &&
                 cycleState != Worker.State.CANCELLED &&
                 cycleState != Worker.State.SCHEDULED) {
                 return true;
@@ -253,8 +252,9 @@ public class MainAppController {
         }
     }
 
+//    TODO: HERE must be a check for the act of bytes transmission, not for task running
     public String getCurrentArtifactName() {
-        if (cycleIsRunning()) {
+        if (cycleIsActive()) {
             return downloadService.currentTask.getCurrentBuildName();
         } else {
             return "";
@@ -272,7 +272,7 @@ public class MainAppController {
         }
         java.awt.MenuItem menuItem_quit = new java.awt.MenuItem("Quit");
         menuItem_quit.addActionListener(e ->
-            promptConfirmation(currentArtifactName)
+            prompTrayQuitConfirmation(currentArtifactName)
         );
         java.awt.MenuItem menuItem_restore = new java.awt.MenuItem("Restore");
         menuItem_restore.addActionListener(e -> {
@@ -292,9 +292,12 @@ public class MainAppController {
             e.printStackTrace();
         }
         String trayNotificationMessage = null;
-        if (cycleIsRunning()) {
-            trayNotificationMessage = ("Build is currently downloading: " + currentArtifactName);
-            trayIcon.displayMessage("Running as daemon", trayNotificationMessage, TrayIcon.MessageType.INFO);
+
+        //    TODO: HERE must be a check for the act of download, not task running
+        if (cycleIsActive()) {
+        trayNotificationMessage = ("Build is currently downloading: " + currentArtifactName);
+        trayIcon.displayMessage("Running in background", trayNotificationMessage, TrayIcon.MessageType.INFO);
+
             MainWindowisHidden = true;
         } else {
             Platform.exit();
@@ -303,7 +306,7 @@ public class MainAppController {
 
     }
 
-    private void promptConfirmation(String currentlyDownloadingBuildName) {
+    private void prompTrayQuitConfirmation(String currentlyDownloadingBuildName) {
         final String currentArtifactName = currentlyDownloadingBuildName;
         Platform.runLater(new Runnable() {
             @Override

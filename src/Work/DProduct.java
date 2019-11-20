@@ -86,8 +86,15 @@ public class DProduct {
             return artifact;
     }
 
+    File buildPath2Artifact_local(String productFileName) {
+        if (!productsHomeFolder.exists()) {
+            productsHomeFolder.mkdir();
+        }
+        return new File(productsHomeFolder, productFileName);
+    }
+
     private File pickSuitableFile(File buildNumberFolder) throws FileNotFoundException {
-    //scans remote folder if there a file one of Common.EXTENSIONS
+        //scans remote folder if there a file one of Common.EXTENSIONS
         File[] artifactsInFolder = buildNumberFolder.listFiles();
         for (int i = 0; i < Common.FILE_EXTENSIONS.length; i++) {
             for (int j = 0; j < artifactsInFolder.length; j++) {
@@ -100,13 +107,6 @@ public class DProduct {
             }
         }
         throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
-    }
-
-    File buildPath2Artifact_local(String productFileName) {
-        if (!productsHomeFolder.exists()) {
-            productsHomeFolder.mkdir();
-        }
-        return new File(productsHomeFolder, productFileName);
     }
 
     void persistLatestDownload(File targetFolderPath, String productName, int latestBuildNumber) {

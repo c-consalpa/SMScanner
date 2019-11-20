@@ -64,11 +64,8 @@ public class MainApp extends Application {
     private void preventClosingIfRunning(Stage stage) {
 
         stage.setOnCloseRequest(we -> {
-            boolean cycleStatus = controller.cycleIsRunning();
-            System.out.println(cycleStatus);
-
+            boolean cycleStatus = controller.cycleIsActive();
             stage.hide();
-
             if (SystemTray.isSupported()) {
                 controller.addAppToTray(stage);
                 we.consume();
