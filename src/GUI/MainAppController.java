@@ -106,7 +106,7 @@ public class MainAppController {
         String version = getVersion();
         File destination = getDestination2DownloadFiles();
         int pollingInterval = getPollInterval();
-        downloadService = new DownloadService(products, version, destination, this);
+        downloadService = new DownloadService(products, version, this);
         downloadService.setPeriod(Duration.hours(pollingInterval));
 //        downloadService.setPeriod(Duration.seconds(20));
         downloadService.start();
@@ -170,7 +170,7 @@ public class MainAppController {
     }
 
     private void setupVersionChoiceList() {
-        String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0"};
+        String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1", "9.3.0"};
         ObservableList<String> versionObsList = FXCollections.observableArrayList(versionsArr);
         choice_version.setItems(versionObsList);
 //        last array elem is default
@@ -181,7 +181,7 @@ public class MainAppController {
         Integer[] intervalArr = new Integer[]{3, 6, 9, 12, 24, 48};
         ObservableList pollIntervalList = FXCollections.observableArrayList(intervalArr);
         choice_poll.setItems(pollIntervalList);
-        choice_poll.getSelectionModel().select(pollIntervalList.indexOf(24));
+        choice_poll.getSelectionModel().select(pollIntervalList.indexOf(12));
     }
 
     private List<String> getProductsFromCheckboxes() {

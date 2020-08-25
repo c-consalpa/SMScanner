@@ -77,6 +77,7 @@ public class DownloadTask extends Task<String> {
 
         for (int i = 0; i < products.length; i++) {
             String productName = products[i];
+
 //            if a product download is cancelled, no need to waste time with others in products[]:
             if (isCancelled()) return;
 
@@ -140,6 +141,8 @@ public class DownloadTask extends Task<String> {
             }
         }
     }
+
+
 
     private boolean downloadFiles(File pathToArtifact_remote, File pathToArtifact_local) {
         //TODO rewrite this awful 165-year-old-slow-granddad-like downloader

@@ -9,9 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import static Utils.Common.FS_DELIMITER;
-import static Utils.Common.HOMEFS_BUILDS_FOLDER;
-import static Utils.Common.PROPERTY_BUILD_NUMBER_KEY_LOCAL;
+import static Utils.Common.*;
 
 /**
  * Created by c-consalpa on 3/23/2018.
@@ -26,6 +24,7 @@ public class DProduct {
 
 
     DProduct(String productName, String productVersion, MainAppController controller) {
+
         this.productName = productName;
         this.productVersion = productVersion;
         this.controller = controller;
@@ -94,7 +93,7 @@ public class DProduct {
     }
 
     private File pickSuitableFile(File buildNumberFolder) throws FileNotFoundException {
-        //scans remote folder if there a file one of Common.EXTENSIONS
+        //scans remote folder if there is a file one of Common.EXTENSIONS
         File[] artifactsInFolder = buildNumberFolder.listFiles();
         for (int i = 0; i < Common.FILE_EXTENSIONS.length; i++) {
             for (int j = 0; j < artifactsInFolder.length; j++) {
@@ -104,6 +103,12 @@ public class DProduct {
                     System.out.println(artifactsInFolder[j].getName());
                     return artifactsInFolder[j];
                 }
+                // FHIR Module misnaming issue:
+                if(artifactsInFolder[j].getName().matches("XESFHIRModule" + ".*\\." + Common.FILE_EXTENSIONS[i])) {
+                    System.out.println(artifactsInFolder[j].getName());
+                    return artifactsInFolder[j];
+                }
+
             }
         }
         throw new FileNotFoundException("Can't find matching files in folder: " + buildNumberFolder.getAbsolutePath());
@@ -124,4 +129,5 @@ public class DProduct {
             System.out.println("CANT WRITE TO PROPERTY FILE AT " + targetFolderPath);
         }
     }
+
 }

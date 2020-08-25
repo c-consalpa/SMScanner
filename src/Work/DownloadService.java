@@ -11,14 +11,13 @@ import java.io.File;
 public class DownloadService extends ScheduledService<String> {
     private final String[] products;
     private final String version;
-    private final File destination;
+
     MainAppController controller;
     public DownloadTask currentTask = null;
 
-    public DownloadService(String[] products, String version, File destination, MainAppController mainAppController) {
+    public DownloadService(String[] products, String version, MainAppController mainAppController) {
         this.products = products;
         this.version = version;
-        this.destination = destination;
         controller = mainAppController;
     }
 
@@ -31,7 +30,6 @@ public class DownloadService extends ScheduledService<String> {
     @Override
     protected void succeeded() {
         super.succeeded();
-        System.out.println(getLastValue());
     }
 
 

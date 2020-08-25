@@ -41,11 +41,12 @@
                               <Label text="Products" />
                               <CheckBox fx:id="prod_EAM" mnemonicParsing="false" text="EAM" GridPane.rowIndex="1" />
                               <CheckBox fx:id="prod_XEServer" mnemonicParsing="false" text="XEServer" GridPane.rowIndex="2" />
-                              <CheckBox fx:id="prod_XEConnect" mnemonicParsing="false" text="XEConnect" GridPane.rowIndex="5" />
+                              <CheckBox fx:id="prod_XEConnect" mnemonicParsing="false" text="XEConnect" GridPane.rowIndex="3" />
+                              <CheckBox fx:id="prod_XESManager" mnemonicParsing="false" text="XESManager" GridPane.rowIndex="4" />
+                              <CheckBox fx:id="prod_VisualizerServer" mnemonicParsing="false" text="Visualizer Server" GridPane.rowIndex="5" />
                               <CheckBox fx:id="prod_XProcessManagement" mnemonicParsing="false" text="XProcess Management" GridPane.rowIndex="6" />
-                              <CheckBox fx:id="prod_XESManager" mnemonicParsing="false" text="XESManager" GridPane.rowIndex="3" />
                               <CheckBox fx:id="prod_SpecBuilder" mnemonicParsing="false" text="SpecBuilder" GridPane.rowIndex="7" />
-                              <CheckBox fx:id="prod_VisualizerServer" mnemonicParsing="false" text="Visualizer Server" GridPane.rowIndex="4" />
+                              <CheckBox fx:id="prod_XESModuleForFHIR" mnemonicParsing="false" text="XESModuleForFHIR" GridPane.rowIndex="8" />
                            </children>
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
