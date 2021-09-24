@@ -62,9 +62,10 @@ public class MainApp extends Application {
     }
 
     private void preventClosingIfRunning(Stage stage) {
+
         stage.setOnCloseRequest(we -> {
-            stage.hide();
-            if (SystemTray.isSupported()) {
+            if (SystemTray.isSupported() && controller.isDownloadingNow()) {
+                stage.hide();
                 controller.addAppToTray(stage);
                 we.consume();
             } else {

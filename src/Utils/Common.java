@@ -16,7 +16,9 @@ public class Common {
     //    Properties that carry latest version info on local fs/net
     public static final String PROPERTY_BUILD_NUMBER_KEY_LOCAL = "b_version";
     public static final String propsFileTemplate = "Last downloaded %s build;";
-
+    public static final String[] versions = new String[]{
+            "8.6.0", "8.8.0", "8.8.1", "9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1", "9.2.2", "9.2.3", "9.3.0"
+    };
 
     public static int getBuildNumberFromProps(File propertyFile, String propertyName) {
         int buildNumber = 0;

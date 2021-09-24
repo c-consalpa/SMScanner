@@ -170,8 +170,8 @@ public class MainAppController {
     }
 
     private void setupVersionChoiceList() {
-        String[] versionsArr = new String[]{"8.6.0", "8.8.0", "8.8.1", "9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1", "9.3.0"};
-        ObservableList<String> versionObsList = FXCollections.observableArrayList(versionsArr);
+
+        ObservableList<String> versionObsList = FXCollections.observableArrayList(Common.versions);
         choice_version.setItems(versionObsList);
 //        last array elem is default
         choice_version.getSelectionModel().select(versionObsList.size() - 1);
